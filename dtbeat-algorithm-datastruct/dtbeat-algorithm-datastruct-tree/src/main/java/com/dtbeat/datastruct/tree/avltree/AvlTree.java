@@ -1,7 +1,6 @@
-package com.dtbeat.datastruct.avltree;
+package com.dtbeat.datastruct.tree.avltree;
 
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -23,6 +22,44 @@ public class AvlTree<K, V> implements Comparator<K> {
     public AvlTree(Comparator<K> comparator) {
         this();
         this.comparator = Objects.requireNonNull(comparator);
+    }
+
+    /**
+     * Returns value with specified key.
+     *
+     * @param key key with which the specified value is to be associated
+     * @return value to be associated with the specified key. or null if none
+     */
+    public V get(K key) {
+        Node<K, V> node = getVal(root, key);
+        return node == null ? null : node.value;
+    }
+
+    final Node<K, V> getVal(Node<K, V> node, K key) {
+        if (node == null) {
+            return null;
+        }
+
+        if (compare(key, node.key) < 0) {
+            return getVal(node.left, key);
+        } else if (compare(key, node.key) > 0) {
+            return getVal(node.right, key);
+        } else {
+            return node;
+        }
+    }
+
+    /**
+     * Sets new value with specified key.
+     *
+     * @param key   key with which the specified value is to be associated
+     * @param value new value to be associated with the specified key
+     */
+    public void set(K key, V value) {
+        Node<K, V> node = getVal(root, key);
+        if (node != null) {
+            node.value = value;
+        }
     }
 
     /**
@@ -57,16 +94,75 @@ public class AvlTree<K, V> implements Comparator<K> {
 
         if (compare(key, node.key) < 0) {
             node.left = putVal(node.left, key, value, onlyIfAbsent);
-        } else if(compare(key, node.key) > 0) {
+        } else if (compare(key, node.key) > 0) {
             node.right = putVal(node.right, key, value, onlyIfAbsent);
         } else if (!onlyIfAbsent) {
             node.value = value;
         }
 
+        return rebalance(node);
+    }
+
+    /**
+     * Deletes node with the specified key.
+     *
+     * @param key key with which the specified node is to be associated
+     */
+    public void delete(K key) {
+        root = deleteVal(this.root, key);
+    }
+
+    final Node<K, V> deleteVal(Node<K, V> node, K key) {
+        if (node == null) {
+            return null;
+        }
+
+        if (compare(key, node.key) < 0) {
+            node.left = deleteVal(node.left, key);
+        } else if (compare(key, node.key) > 0) {
+            node.right = deleteVal(node.right, key);
+        } else {
+            // only has left child
+            if (node.right == null && node.left != null) {
+                Node<K, V> leftNode = node.left;
+                node.left = null;
+                node = leftNode;
+                size--;
+            } else if (node.right != null && node.left == null) {
+                // only has right child
+                Node<K, V> rightNode = node.right;
+                node.right = null;
+                node = rightNode;
+                size--;
+            } else if (node.right == null) {
+                // leaf node
+                node = null;
+                size--;
+            } else {
+                // has left and right child
+                // find min node of the right tree
+                Node<K, V> rightMinNode = findMin(node.right);
+                // delete min node from right tree
+                rightMinNode.right = deleteVal(node.right, rightMinNode.key);
+                rightMinNode.left = node.left;
+                node.left = node.right = null;
+                node = rightMinNode;
+            }
+        }
+
+        if (node == null) {
+            return null;
+        }
+
+        return rebalance(node);
+    }
+
+    private Node<K, V> rebalance(Node<K, V> node) {
         // update depth
         updateDepth(node);
+
         int factor = getBalanceFactor(node);
-        
+
         // LL
         if (factor > 1 && getBalanceFactor(node.left) >= 0) {
             return rightRotate(node);
@@ -92,7 +188,7 @@ public class AvlTree<K, V> implements Comparator<K> {
         return node;
     }
 
-    private Node<K,V> leftRotate(Node<K,V> node) {
+    private Node<K, V> leftRotate(Node<K, V> node) {
         Node<K, V> newRoot = node.right;
         Node<K, V> rightNode = newRoot.left;
 
@@ -105,7 +201,7 @@ public class AvlTree<K, V> implements Comparator<K> {
         return newRoot;
     }
 
-    private Node<K,V> rightRotate(Node<K,V> node) {
+    private Node<K, V> rightRotate(Node<K, V> node) {
         Node<K, V> newRoot = node.left;
         Node<K, V> leftNode = newRoot.right;
 
@@ -148,6 +244,14 @@ public class AvlTree<K, V> implements Comparator<K> {
         node.depth = Math.max(leftDepth, rightDepth) + 1;
     }
 
+    private Node<K, V> findMin(Node<K, V> node) {
+        if (node.left != null) {
+            return findMin(node.left);
+        }
+
+        return node;
+    }
+
     private int getBalanceFactor(Node<K, V> node) {
         if (node == null) {
             return 0;
@@ -158,18 +262,14 @@ public class AvlTree<K, V> implements Comparator<K> {
 
     public String toVlrString() {
         StringBuilder writer = new StringBuilder();
-        toVlrString0(writer, this.root, null);
+        toVlrString0(writer, this.root);
 
         return writer.toString();
     }
 
-    private void toVlrString0(StringBuilder writer, Node<K, V> node, HashSet<K> cache) {
+    private void toVlrString0(StringBuilder writer, Node<K, V> node) {
         if (node == null) {
             return;
-        }
-
-        if (cache == null) {
-            cache = new HashSet<>();
         }
 
         if (writer == null) {
@@ -177,18 +277,9 @@ public class AvlTree<K, V> implements Comparator<K> {
         }
 
         writer.append(node.key.toString());
-        cache.add(node.key);
 
-        toVlrString0(writer, node.left, cache);
-        toVlrString0(writer, node.right, cache);
-    }
-
-    @Override
-    public String toString() {
-        return "AvlTree{" +
-                "key=" + root != null ? root.key.toString() : "null"  +
-                ", size=" + size +
-                '}';
+        toVlrString0(writer, node.left);
+        toVlrString0(writer, node.right);
     }
 
     /**

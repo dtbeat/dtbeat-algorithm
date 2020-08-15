@@ -12,7 +12,7 @@
     <artifactId>dtbeat-algorithm-datastruct</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>dtbeat-algorithm-datastruct-avltree</module>
+        <module>dtbeat-algorithm-datastruct-tree</module>
     </modules>
 
 

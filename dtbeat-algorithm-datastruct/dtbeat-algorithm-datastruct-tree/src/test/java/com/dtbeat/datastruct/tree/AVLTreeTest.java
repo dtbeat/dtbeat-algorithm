@@ -1,21 +1,15 @@
-package com.dtbeat.datastruct.tree.avltree;
+package com.dtbeat.datastruct.tree;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * AvlTreeTest
- *
- * @author elvinshang
- * @version $Id:: AvlTreeTest.java, v0.0.1 2020/8/15 11:49 geekdancer.com $
- */
-public class AvlTreeTest {
-    private static final Logger LOG = LoggerFactory.getLogger(AvlTreeTest.class);
+public class AVLTreeTest {
+    private static final Logger LOG = LoggerFactory.getLogger(AVLTreeTest.class);
 
     /**
-     * test LR delete and rotate
+     * test LR remove and rotate
      * lr: left rotate
      * rr: right rotate
      * LR: Left-Right
@@ -23,35 +17,35 @@ public class AvlTreeTest {
      *
      * (A)LR       8          (B)LL    8       (C)balance     8       (D)balance      8
      *            / \                / \                     / \                     / \
-     *           6   9  lr          6   9  rr               5   9   delete 5        6   9
+     *           6   9  lr          6   9  rr               5   9   remove 5        6   9
      *          /       =>         /       =>              / \      =>             /
      *      <- 4               -> 5                       4   6                   4
      *          \                /
      *           5              4
      */
     @Test
-    public void testLRDelete() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+    public void testLRRemove() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{8, 6, 9, 4, 5};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("85469", avlTree.toVlrString());
+        Assert.assertEquals("85469", avlTree.toPreOrderString());
 
-        avlTree.delete(5);
+        avlTree.remove(5);
         if (LOG.isDebugEnabled()) {
-            LOG.debug(avlTree.toVlrString());
+            LOG.debug(avlTree.toPreOrderString());
         }
 
-        Assert.assertEquals("8649", avlTree.toVlrString());
+        Assert.assertEquals("8649", avlTree.toPreOrderString());
     }
 
     /**
-     * test LL delete and rotate
+     * test LL remove and rotate
      * lr: left rotate
      * rr: right rotate
      * LR: Left-Right
@@ -59,36 +53,36 @@ public class AvlTreeTest {
      *
      * (A)LL       4          (B)balance    4          (C)balance    4
      *            / \                      / \                      / \
-     *           3   5  rr                2   5   delete 1         2   5
+     *           3   5  rr                2   5   remove 1         2   5
      *          /       =>               / \      =>                \
      *      -> 2                        1   3                        3
      *        /
      *       1
      */
     @Test
-    public void testLLDelete() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+    public void testLLRemove() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 5, 2, 1};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("42135", avlTree.toVlrString());
+        Assert.assertEquals("42135", avlTree.toPreOrderString());
 
 
-        avlTree.delete(1);
+        avlTree.remove(1);
         if (LOG.isDebugEnabled()) {
-            LOG.debug(avlTree.toVlrString());
+            LOG.debug(avlTree.toPreOrderString());
         }
 
-        Assert.assertEquals("4235", avlTree.toVlrString());
+        Assert.assertEquals("4235", avlTree.toPreOrderString());
     }
 
     /**
-     * test RR delete and rotate
+     * test RR remove and rotate
      * lr: left rotate
      * rr: right rotate
      * LR: Left-Right
@@ -96,36 +90,36 @@ public class AvlTreeTest {
      *
      * (A)RR       4             (B)balance    4             (C)balance    4
      *            / \                         / \                         / \
-     *           3   5      rr               3   6      delete 7         3   6
+     *           3   5      rr               3   6      remove 7         3   6
      *                \     =>                  / \     =>                  /
      *                6                        5   7                       5
      *                 \
      *                  7
      */
     @Test
-    public void testRRDelete() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+    public void testRRRemove() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 5, 6, 7};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("43657", avlTree.toVlrString());
+        Assert.assertEquals("43657", avlTree.toPreOrderString());
 
 
-        avlTree.delete(7);
+        avlTree.remove(7);
         if (LOG.isDebugEnabled()) {
-            LOG.debug(avlTree.toVlrString());
+            LOG.debug(avlTree.toPreOrderString());
         }
 
-        Assert.assertEquals("4365", avlTree.toVlrString());
+        Assert.assertEquals("4365", avlTree.toPreOrderString());
     }
 
     /**
-     * test RL delete and rotate
+     * test RL remove and rotate
      * lr: left rotate
      * rr: right rotate
      * LR: Left-Right
@@ -133,32 +127,32 @@ public class AvlTreeTest {
      *
      * (A)RR       4             (B)RR         4            (C)balance     4           (D)balance      4
      *            / \                         / \                         / \                         / \
-     *           3   7      rr               3   7      lr               3   8       delete 8        3   9
+     *           3   7      rr               3   7      lr               3   8       remove 8        3   9
      *                \     =>                   \      =>                  / \      =>                 /
      *                9                           8                        7   9                       7
      *               /                            \
      *              8                             9
      */
     @Test
-    public void testRLDelete() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+    public void testRLRemove() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 7, 9, 8};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("43879", avlTree.toVlrString());
+        Assert.assertEquals("43879", avlTree.toPreOrderString());
 
 
-        avlTree.delete(8);
+        avlTree.remove(8);
         if (LOG.isDebugEnabled()) {
-            LOG.debug(avlTree.toVlrString());
+            LOG.debug(avlTree.toPreOrderString());
         }
 
-        Assert.assertEquals("4397", avlTree.toVlrString());
+        Assert.assertEquals("4397", avlTree.toPreOrderString());
     }
 
     /**
@@ -178,16 +172,16 @@ public class AvlTreeTest {
      */
     @Test
     public void testLRPut() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{8, 6, 9, 4, 5};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("85469", avlTree.toVlrString());
+        Assert.assertEquals("85469", avlTree.toPreOrderString());
     }
 
     /**
@@ -207,16 +201,16 @@ public class AvlTreeTest {
      */
     @Test
     public void testLLPut() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 5, 2, 1};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("42135", avlTree.toVlrString());
+        Assert.assertEquals("42135", avlTree.toPreOrderString());
     }
 
     /**
@@ -236,16 +230,16 @@ public class AvlTreeTest {
      */
     @Test
     public void testRRPut() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 5, 6, 7};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("43657", avlTree.toVlrString());
+        Assert.assertEquals("43657", avlTree.toPreOrderString());
     }
 
     /**
@@ -265,26 +259,26 @@ public class AvlTreeTest {
      */
     @Test
     public void testRLPut() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 7, 9, 8};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
-        Assert.assertEquals("43879", avlTree.toVlrString());
+        Assert.assertEquals("43879", avlTree.toPreOrderString());
     }
 
     @Test
     public void testGet() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 7, 9, 8};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
@@ -293,12 +287,12 @@ public class AvlTreeTest {
 
     @Test
     public void testGetNullValue() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 7, 9, 8};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
@@ -307,12 +301,12 @@ public class AvlTreeTest {
 
     @Test
     public void testSet() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 7, 9, 8};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 
@@ -323,12 +317,12 @@ public class AvlTreeTest {
 
     @Test
     public void testSetButNotSuccess() {
-        AvlTree<Integer, Integer> avlTree = new AvlTree<>();
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
         int[] elements = new int[]{4, 3, 7, 9, 8};
         for (int element : elements) {
             avlTree.put(element, element);
             if (LOG.isDebugEnabled()) {
-                LOG.debug(avlTree.toVlrString());
+                LOG.debug(avlTree.toPreOrderString());
             }
         }
 

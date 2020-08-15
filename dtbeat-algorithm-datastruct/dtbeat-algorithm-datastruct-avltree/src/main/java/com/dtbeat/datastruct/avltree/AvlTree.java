@@ -1,13 +1,14 @@
 package com.dtbeat.datastruct.avltree;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
  * AVL Tree
  *
  * @author elvinshang
- * @version $Id: AvlTree.java, v0.0.1 2020/8/14 15:28 geekdancer.com $
+ * @version $Id: AvlTree.java, v0.0.1 2020/8/14 15:28 btbeat.com $
  */
 public class AvlTree<K, V> implements Comparator<K> {
     private Node<K, V> root;
@@ -48,11 +49,10 @@ public class AvlTree<K, V> implements Comparator<K> {
      * @return new root node
      */
     final Node<K, V> putVal(Node<K, V> node, K key, V value, boolean onlyIfAbsent) {
-        Node<K, V> newNode = new Node<>(key, value);
         if (node == null) {
             this.size++;
 
-            return newNode;
+            return new Node<>(key, value);
         }
 
         if (compare(key, node.key) < 0) {
@@ -73,7 +73,7 @@ public class AvlTree<K, V> implements Comparator<K> {
         }
 
         // RR
-        if (factor > -1 && getBalanceFactor(node.right) <= 0) {
+        if (factor < -1 && getBalanceFactor(node.right) <= 0) {
             return leftRotate(node);
         }
 
@@ -93,29 +93,29 @@ public class AvlTree<K, V> implements Comparator<K> {
     }
 
     private Node<K,V> leftRotate(Node<K,V> node) {
-        Node<K, V> rootNode = node.right;
-        Node<K, V> rightNode = rootNode.left;
+        Node<K, V> newRoot = node.right;
+        Node<K, V> rightNode = newRoot.left;
 
-        rootNode.left = node;
-        rootNode.right = rightNode;
+        newRoot.left = node;
+        node.right = rightNode;
 
         updateDepth(node);
-        updateDepth(rootNode);
+        updateDepth(newRoot);
 
-        return rootNode;
+        return newRoot;
     }
 
     private Node<K,V> rightRotate(Node<K,V> node) {
-        Node<K, V> rootNode = node.left;
-        Node<K, V> leftNode = rootNode.right;
+        Node<K, V> newRoot = node.left;
+        Node<K, V> leftNode = newRoot.right;
 
-        rootNode.right = node;
-        rootNode.left = leftNode;
+        newRoot.right = node;
+        node.left = leftNode;
 
         updateDepth(node);
-        updateDepth(rootNode);
+        updateDepth(newRoot);
 
-        return rootNode;
+        return newRoot;
     }
 
     @Override
@@ -156,6 +156,41 @@ public class AvlTree<K, V> implements Comparator<K> {
         return getDepth(node.left) - getDepth(node.right);
     }
 
+    public String toVlrString() {
+        StringBuilder writer = new StringBuilder();
+        toVlrString0(writer, this.root, null);
+
+        return writer.toString();
+    }
+
+    private void toVlrString0(StringBuilder writer, Node<K, V> node, HashSet<K> cache) {
+        if (node == null) {
+            return;
+        }
+
+        if (cache == null) {
+            cache = new HashSet<>();
+        }
+
+        if (writer == null) {
+            writer = new StringBuilder();
+        }
+
+        writer.append(node.key.toString());
+        cache.add(node.key);
+
+        toVlrString0(writer, node.left, cache);
+        toVlrString0(writer, node.right, cache);
+    }
+
+    @Override
+    public String toString() {
+        return "AvlTree{" +
+                "key=" + root != null ? root.key.toString() : "null"  +
+                ", size=" + size +
+                '}';
+    }
+
     /**
      * AVL Node
      */
@@ -174,6 +209,15 @@ public class AvlTree<K, V> implements Comparator<K> {
             this.parent = null;
             this.left = null;
             this.right = null;
+        }
+
+        @Override
+        public String toString() {
+            return "Node{" +
+                    "key=" + key +
+                    ", value=" + value +
+                    ", depth=" + depth +
+                    '}';
         }
     }
 }

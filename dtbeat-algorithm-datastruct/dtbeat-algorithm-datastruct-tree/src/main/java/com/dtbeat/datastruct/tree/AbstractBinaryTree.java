@@ -8,7 +8,7 @@ import java.util.Comparator;
  * @author elvinshang
  * @version Id:: AbstractBinaryTree.java, v0.0.1 2020/8/15 23:07 btbeat.com $
  */
-public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
+public abstract class AbstractBinaryTree<K, V> {
     private Node<K, V> root;
     private int size;
     private Comparator<K> comparator;
@@ -82,7 +82,7 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
      * Returns <tt>true</tt> if this tree contains a mapping for the
      * specified key.
      *
-     * @param   key   The key whose presence in this tree is to be tested
+     * @param key The key whose presence in this tree is to be tested
      * @return <tt>true</tt> if this tree contains a mapping for the specified
      * key.
      */
@@ -100,6 +100,9 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
      */
     public void put(K key, V value) {
         root = putNode(root, key, value);
+        if (root != null) {
+            root.parent = null;
+        }
     }
 
     protected Node<K, V> putNode(Node<K, V> node, K key, V value) {
@@ -110,8 +113,14 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
 
         if (compare(key, node.key) < 0) {
             node.left = putNode(node.left, key, value);
+            if (node.left != null) {
+                node.left.parent = node;
+            }
         } else if (compare(key, node.key) > 0) {
             node.right = putNode(node.right, key, value);
+            if (node.right != null) {
+                node.right.parent = node;
+            }
         } else {
             node.value = value;
         }
@@ -121,6 +130,9 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
 
     public void remove(K key) {
         root = removeNode(root, key);
+        if (root != null) {
+            root.parent = null;
+        }
     }
 
     protected Node<K, V> removeNode(Node<K, V> node, K key) {
@@ -130,27 +142,34 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
 
         if (compare(key, node.key) < 0) {
             node.left = removeNode(node.left, key);
+            if (node.left != null) {
+                node.left.parent = node;
+            }
         } else if (compare(key, node.key) > 0) {
             node.right = removeNode(node.right, key);
+            if (node.right != null) {
+                node.right.parent = node;
+            }
         } else {
             if (node.left != null && node.right == null) {
                 Node<K, V> leftNode = node.left;
-                node.left = null;
+                node.left = node.parent = null;
                 size--;
                 node = leftNode;
             } else if (node.left == null && node.right != null) {
                 Node<K, V> rightNode = node.right;
-                node.right = null;
+                node.right = node.parent = null;
                 size--;
                 node = rightNode;
             } else if (node.left == null && node.right == null) {
                 size--;
+                node.parent = null;
                 node = null;
             } else {
                 Node<K, V> minNode = findMin(node.right);
                 minNode.right = removeNode(node.right, minNode.key);
                 minNode.left = node.left;
-                node.left = node.right = null;
+                node.left = node.right = node.parent = null;
                 size--;
                 node = minNode;
             }
@@ -167,8 +186,7 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
         return node;
     }
 
-    @Override
-    public int compare(K o1, K o2) {
+    final int compare(K o1, K o2) {
         if (comparator != null) {
             return comparator.compare(o1, o2);
         } else if (o1 instanceof Comparable) {
@@ -178,11 +196,66 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
         }
     }
 
+    /**
+     * Returns a preorder based string
+     *
+     * @return a preorder based string
+     */
     public String toPreOrderString() {
         StringBuilder writer = new StringBuilder();
         toPreOrderString0(writer, this.root);
 
         return writer.toString();
+    }
+
+    /**
+     * Returns pre node of the specified key
+     *
+     * @param key the key
+     * @return pre node of the specified key
+     */
+    public K getPre(K key) {
+        Node<K, V> node = getVal(root, key);
+        if (node == null) {
+            return null;
+        }
+
+        Node<K, V> s;
+
+        // has left child and find right-most child node
+        if (node.left != null) {
+            for (s = node.left; s.right != null; s = s.right) ;
+            return s != null ? s.key : null;
+        }
+
+        // find ancestor node and the ancestor node's right node is ancestor node or self
+        for (s = node; s.parent != null && s.parent.left == s; s = s.parent) ;
+        return s.parent != null ? s.parent.key : null;
+    }
+
+    /**
+     * Returns post node of the specified key
+     *
+     * @param key the key
+     * @return post node of the specified key
+     */
+    public K getPost(K key) {
+        Node<K, V> node = getVal(root, key);
+        if (node == null) {
+            return null;
+        }
+
+        Node<K, V> s;
+
+        // has left child and find left-most child node
+        if (node.right != null) {
+            for (s = node.right; s.left != null; s = s.left) ;
+            return s != null ? s.key : null;
+        }
+
+        // find ancestor node and the ancestor node's right node is ancestor node or self
+        for (s = node; s.parent != null && s.parent.right == s; s = s.parent) ;
+        return s.parent != null ? s.parent.key : null;
     }
 
     private void toPreOrderString0(StringBuilder writer, Node<K, V> node) {
@@ -226,6 +299,7 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
         final K key;
         V value;
         int depth;
+        Node<K, V> parent;
         Node<K, V> left;
         Node<K, V> right;
 
@@ -234,6 +308,7 @@ public abstract class AbstractBinaryTree<K, V> implements Comparator<K> {
             this.value = value;
             this.left = null;
             this.right = null;
+            this.parent = null;
             this.depth = 1;
         }
 

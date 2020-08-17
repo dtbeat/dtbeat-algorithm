@@ -224,4 +224,112 @@ public class BSTreeTest {
 
         Assert.assertNull(tree.get(10));
     }
+
+    /**
+     * test get pre node with left child
+     *
+     *             8
+     *            / \
+     *           6   9
+     *          /
+     *         2
+     *        / \
+     *       1   4
+     *          / \
+     *         3  5
+     */
+    @Test
+    public void testGetPreWithLeftChild() {
+        BSTree<Integer, Integer> tree = new BSTree<>();
+        int[] elements = new int[]{8, 6, 9, 2, 1, 4, 3, 5};
+        for (int element : elements) {
+            tree.put(element, element);
+        }
+        Assert.assertEquals("86214359", tree.toPreOrderString());
+
+        Integer preNodeKey = tree.getPre(6);
+        Assert.assertNotNull(preNodeKey);
+        Assert.assertEquals(5, preNodeKey.intValue());
+    }
+
+    /**
+     * test get pre node without left child
+     *
+     *             8
+     *            / \
+     *           6   9
+     *          /
+     *         2
+     *        / \
+     *       1   4
+     *          / \
+     *         3  5
+     */
+    @Test
+    public void testGetPreWithoutLeftChild() {
+        BSTree<Integer, Integer> tree = new BSTree<>();
+        int[] elements = new int[]{8, 6, 9, 2, 1, 4, 3, 5};
+        for (int element : elements) {
+            tree.put(element, element);
+        }
+        Assert.assertEquals("86214359", tree.toPreOrderString());
+
+        Integer preNodeKey = tree.getPre(3);
+        Assert.assertNotNull(preNodeKey);
+        Assert.assertEquals(2, preNodeKey.intValue());
+    }
+
+    /**
+     * test get post node with right child
+     *
+     *             8
+     *            / \
+     *           6   9
+     *          /
+     *         2
+     *        / \
+     *       1   4
+     *          / \
+     *         3  5
+     */
+    @Test
+    public void testGetPostWithRightChild() {
+        BSTree<Integer, Integer> tree = new BSTree<>();
+        int[] elements = new int[]{8, 6, 9, 2, 1, 4, 3, 5};
+        for (int element : elements) {
+            tree.put(element, element);
+        }
+        Assert.assertEquals("86214359", tree.toPreOrderString());
+
+        Integer preNodeKey = tree.getPost(2);
+        Assert.assertNotNull(preNodeKey);
+        Assert.assertEquals(3, preNodeKey.intValue());
+    }
+
+    /**
+     * test get post node without right child
+     *
+     *             8
+     *            / \
+     *           6   9
+     *          /
+     *         2
+     *        / \
+     *       1   4
+     *          / \
+     *         3  5
+     */
+    @Test
+    public void testGetPostWithoutRightChild() {
+        BSTree<Integer, Integer> tree = new BSTree<>();
+        int[] elements = new int[]{8, 6, 9, 2, 1, 4, 3, 5};
+        for (int element : elements) {
+            tree.put(element, element);
+        }
+        Assert.assertEquals("86214359", tree.toPreOrderString());
+
+        Integer preNodeKey = tree.getPost(5);
+        Assert.assertNotNull(preNodeKey);
+        Assert.assertEquals(6, preNodeKey.intValue());
+    }
 }

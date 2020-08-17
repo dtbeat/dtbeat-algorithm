@@ -330,4 +330,122 @@ public class AVLTreeTest {
 
         Assert.assertNull(avlTree.get(10));
     }
+
+    /**
+     * test getPre with left child
+     * lr: left rotate
+     * rr: right rotate
+     * LR: Left-Right
+     * LL: Left-Left
+     *
+     * (A)LR       8          (B)LL    8       (C)balance     8
+     *            / \                / \                     / \
+     *           6   9  lr          6   9  rr               5   9
+     *          /       =>         /       =>              / \
+     *      <- 4               -> 5                       4   6
+     *          \                /
+     *           5              4
+     */
+    @Test
+    public void testGetPreWithLeftChild() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
+        int[] elements = new int[]{8, 6, 9, 4, 5};
+        for (int element : elements) {
+            avlTree.put(element, element);
+        }
+
+        Assert.assertEquals("85469", avlTree.toPreOrderString());
+        Integer pre = avlTree.getPre(8);
+        Assert.assertNotNull(pre);
+        Assert.assertEquals(6, pre.intValue());
+    }
+
+    /**
+     * test getPre without left child
+     * lr: left rotate
+     * rr: right rotate
+     * LR: Left-Right
+     * LL: Left-Left
+     *
+     * (A)LL       4          (B)balance    4
+     *            / \                      / \
+     *           3   5  rr                2   5
+     *          /       =>               / \
+     *      -> 2                        1   3
+     *        /
+     *       1
+     */
+    @Test
+    public void testGetPreWithoutLeftChild() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
+        int[] elements = new int[]{4, 3, 5, 2, 1};
+        for (int element : elements) {
+            avlTree.put(element, element);
+        }
+
+        Assert.assertEquals("42135", avlTree.toPreOrderString());
+        Integer pre = avlTree.getPre(3);
+        Assert.assertNotNull(pre);
+        Assert.assertEquals(2, pre.intValue());
+    }
+
+    /**
+     * test getPost with right child
+     * lr: left rotate
+     * rr: right rotate
+     * LR: Left-Right
+     * LL: Left-Left
+     *
+     * (A)RR       4             (B)balance    4
+     *            / \                         / \
+     *           3   5      rr               3   6
+     *                \     =>                  / \
+     *                6                        5   7
+     *                 \
+     *                  7
+     */
+    @Test
+    public void getPostWithRightChild() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
+        int[] elements = new int[]{4, 3, 5, 6, 7};
+        for (int element : elements) {
+            avlTree.put(element, element);
+        }
+
+        Assert.assertEquals("43657", avlTree.toPreOrderString());
+
+        Integer pre = avlTree.getPost(4);
+        Assert.assertNotNull(pre);
+        Assert.assertEquals(5, pre.intValue());
+    }
+
+    /**
+     * test RL put and rotate
+     * lr: left rotate
+     * rr: right rotate
+     * LR: Left-Right
+     * LL: Left-Left
+     *
+     * (A)RR       4             (B)RR         4            (C)balance     4
+     *            / \                         / \                         / \
+     *           3   7      rr               3   7      lr               3   8
+     *                \     =>                   \      =>                  / \
+     *                9                           8                        7   9
+     *               /                            \
+     *              8                             9
+     */
+    @Test
+    public void testGetPostWithoutRightChild() {
+        AVLTree<Integer, Integer> avlTree = new AVLTree<>();
+        int[] elements = new int[]{4, 3, 7, 9, 8};
+        for (int element : elements) {
+            avlTree.put(element, element);
+        }
+
+        Assert.assertEquals("43879", avlTree.toPreOrderString());
+
+        Integer pre = avlTree.getPost(7);
+        Assert.assertNotNull(pre);
+        Assert.assertEquals(8, pre.intValue());
+    }
 }

@@ -66,6 +66,7 @@ public class AVLTree<K, V> extends AbstractBinaryTree<K, V> {
 
         newRoot.left = node;
         node.right = rightNode;
+        node.parent = newRoot;
 
         updateDepth(node);
         updateDepth(newRoot);
@@ -79,6 +80,7 @@ public class AVLTree<K, V> extends AbstractBinaryTree<K, V> {
 
         newRoot.right = node;
         node.left = leftNode;
+        node.parent = newRoot;
 
         updateDepth(node);
         updateDepth(newRoot);

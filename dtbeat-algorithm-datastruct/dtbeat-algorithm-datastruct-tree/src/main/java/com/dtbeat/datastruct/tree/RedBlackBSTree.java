@@ -2,7 +2,6 @@ package com.dtbeat.datastruct.tree;
 
 import java.util.Comparator;
 import java.util.Stack;
-import java.util.TreeMap;
 
 /**
  * Red-Black Binary Search Tree
@@ -78,6 +77,221 @@ public class RedBlackBSTree<K, V> {
 
         fixAfterInsertion(node);
         size++;
+
+        return null;
+    }
+
+    public V remove(K key) {
+        Node<K, V> node = getNode(key);
+        if (null == node) {
+            return null;
+        }
+
+        V oldValue = node.value;
+        deleteNode(node);
+
+        return oldValue;
+    }
+
+    final void deleteNode(Node<K, V> node) {
+        size--;
+
+        // node has left and right child node
+        if (node.left != null && node.right != null) {
+            // left-most right node of the node
+            // s has not left child
+            Node<K, V> s = successor(node);
+            node.key = s.key;
+            node.value = s.value;
+            node = s;
+        }
+
+        Node<K, V> replacement = node.left != null ? node.left : node.right;
+        if (replacement != null) {
+            // node has left or right child node
+            replacement.parent = node.parent;
+            if (node.parent == null) {
+                root = replacement;
+            } else if (replacement == node.parent.left) {
+                node.parent.left = replacement;
+            } else {
+                node.parent.right = replacement;
+            }
+
+            // release node
+            node.left = node.right = node.parent = null;
+
+            if (node.color == BLACK) {
+                fixAfterDeletion(replacement);
+            }
+        } else if (node.parent == null) {
+            // the tree has only one node
+            root = null;
+        } else {
+            if (node.color == BLACK) {
+                fixAfterDeletion(node);
+            }
+
+            // the parent node of the node is not null
+            if (node == node.parent.left) {
+                node.parent.left = null;
+            } else if (node == node.parent.right) {
+                node.parent.right = null;
+            }
+            node.parent = null;
+        }
+    }
+
+    private void fixAfterDeletion(Node<K, V> x) {
+        while (x != root && colorOf(x) == BLACK) {
+            if (x == leftOf(parentOf(x))) {
+                Node<K, V> s = rightOf(parentOf(x));
+                // the color of sibling node is red (the color of the parent is black)
+                // change the color of the sibling node to black
+                // change the color of the parent node to red
+                // rotate left by parent node
+                // re-get the sibling node of the x node
+                if (colorOf(s) == RED) {
+                    setColor(s, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateLeft(parentOf(x));
+                    s = rightOf(parentOf(x));
+                }
+
+                // set the color of the sibling node to red, local balance
+                // set x to the parent node of the x node
+                // recall up
+                if (colorOf(leftOf(s)) == BLACK
+                        && colorOf(rightOf(s)) == BLACK) {
+                    setColor(s, RED);
+                    x = parentOf(x);
+                } else {
+                    // the color of the sibling node is black
+                    // the color of the right child node of the sibling node is black
+                    // the color of the left child node of the sibling node is red
+                    // set the color of the sibling to red
+                    // set the color of the left child node of the sibling node to black
+                    // rotate right by the sibling node
+                    // re-get the sibling node of the x node
+                    if (colorOf(rightOf(s)) == BLACK) {
+                        setColor(leftOf(s), BLACK);
+                        setColor(s, RED);
+                        rotateRight(s);
+                        s = rightOf(parentOf(x));
+                    }
+
+                    // exchange color between the parent node of the sibling node and the sibling node
+                    // set the color of the right child node of the sibling node to black
+                    // rotate left by the parent node of the sibling node
+                    // x = root indicate exit from while cycle
+                    setColor(s, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf(s), BLACK);
+                    rotateLeft(parentOf(x));
+                    x = root;
+                }
+            } else {
+                Node<K, V> s = leftOf(parentOf(x));
+                if (colorOf(s) == RED) {
+                    setColor(s, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateRight(parentOf(x));
+                    s = leftOf(parentOf(x));
+                }
+
+                if (colorOf(leftOf(s)) == BLACK
+                        && colorOf(rightOf(s)) == BLACK) {
+                    setColor(s, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(leftOf(s)) == BLACK) {
+                        setColor(rightOf(s), BLACK);
+                        setColor(s, RED);
+                        rotateLeft(s);
+                        s = leftOf(parentOf(x));
+                    }
+
+                    setColor(s, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(s), BLACK);
+                    rotateRight(parentOf(x));
+                    x = root;
+                }
+            }
+        }
+
+        setColor(x, BLACK);
+    }
+
+    static <K, V> Node<K, V> successor(Node<K, V> node) {
+        if (null == node) {
+            return null;
+        }
+
+        if (null != node.right) {
+            Node<K, V> p = node.right;
+            while (p.left != null) {
+                p = p.left;
+            }
+
+            return p;
+        } else {
+            Node<K, V> p = node.parent;
+            Node<K, V> t = node;
+            while (p != null && t == p.right) {
+                t = p;
+                p = p.parent;
+            }
+
+            return p;
+        }
+    }
+
+    static <K, V> Node<K, V> preducessor(Node<K, V> node) {
+        if (null == node) {
+            return null;
+        }
+
+        if (node.left != null) {
+            Node<K, V> t = node.left;
+            while (t.right != null) {
+                t = t.right;
+            }
+
+            return t;
+        } else {
+            Node<K, V> p = node.parent;
+            Node<K, V> t = node;
+            while (p != null && t == p.left) {
+                t = p;
+                p = p.parent;
+            }
+
+            return p;
+        }
+    }
+
+    final Node<K, V> getNode(K key) {
+        if (null == key) {
+            throw new NullPointerException();
+        }
+
+        Node<K, V> t = root;
+        if (null == t) {
+            return null;
+        }
+
+        int cmp;
+        do {
+            cmp = compare(key, t.key);
+            if (cmp < 0) {
+                t = t.left;
+            } else if (cmp > 0) {
+                t = t.right;
+            } else {
+                return t;
+            }
+        } while (null != t);
 
         return null;
     }

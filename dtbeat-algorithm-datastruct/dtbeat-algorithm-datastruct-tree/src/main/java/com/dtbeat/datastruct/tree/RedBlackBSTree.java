@@ -27,6 +27,26 @@ public class RedBlackBSTree<K, V> {
     }
 
     /**
+     * Returns the value to which the specified key is mapped, or null if none
+     *
+     * @param key key with which the specified value is to be associated
+     * @return the value to which the specified key is mapped, or null if none
+     */
+    public V get(K key) {
+        Node<K, V> node = getNode(key);
+        return node == null ? null : node.value;
+    }
+
+    public V set(K key, V value) {
+        Node<K, V> node = getNode(key);
+        if (node != null) {
+            return node.setValue(value);
+        }
+
+        return null;
+    }
+
+    /**
      * Associates the specified value with the specified key in this tree.
      * If the tree previously contained a mapping for the key, the old
      * value is replaced.

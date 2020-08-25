@@ -1,5 +1,6 @@
 package com.dtbeat.datastruct.tree;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -424,8 +425,11 @@ public class BTreeTest {
     }
 
     @Test
-    public void testRemoveDynamic() {
+    @Ignore
+    public void testRemoveWithBatchAndRandom() {
         final int maxKey = 128;
+        final Random rd = new Random(System.currentTimeMillis());
+
         for (int i1 = 3; i1 < 20; i1++) {
             for (int j1 = 0; j1 < 100000; j1++) {
                 BTree<Integer, Integer> tree = new BTree<>(i1);
@@ -433,7 +437,6 @@ public class BTreeTest {
                     tree.put(i, i);
                 }
 
-                Random rd = new Random(System.currentTimeMillis());
                 int start = rd.nextInt(maxKey);
                 int end = getEndIndex(start, rd, maxKey);
 
@@ -444,12 +447,12 @@ public class BTreeTest {
 
                 StringBuilder writer = new StringBuilder();
                 for (int i = 1; i < maxKey; i++) {
-                    if(i < start || i > end) {
+                    if (i < start || i > end) {
                         writer.append(i + "-");
                     }
                 }
 
-                if(writer.length() > 0) {
+                if (writer.length() > 0) {
                     writer.deleteCharAt(writer.length() - 1);
                 }
 
@@ -466,6 +469,7 @@ public class BTreeTest {
 
                 assertEquals(expected, tree.toInOrderString());
             }
+            LOG.info("Auto Test: %{}", Math.round(i1 * 100.0 / 20));
         }
     }
 

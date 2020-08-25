@@ -27,8 +27,10 @@ import java.util.stream.Collectors;
  * @version Id:: BTree.java, v0.0.1 2020/8/22 17:36 dtbeat.com $
  */
 public class BTree<K, V> implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(BTree.class);
     private static final long serialVersionUID = -7375033267031630654L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(BTree.class);
+    private static final int DEFAULT_DEGREE = 3;
 
     private int degree;
     private int minKeys;
@@ -42,8 +44,8 @@ public class BTree<K, V> implements Serializable {
     }
 
     public BTree(int degree, Comparator<? super K> comparator) {
-        if (degree < 2) {
-            throw new IllegalArgumentException("the degree must be equal or greater than " + 2);
+        if (degree < DEFAULT_DEGREE) {
+            throw new IllegalArgumentException("the degree must be equal or greater than " + DEFAULT_DEGREE);
         }
 
         this.degree = degree;
@@ -145,7 +147,7 @@ public class BTree<K, V> implements Serializable {
     }
 
     private void fixAfterDeletion(Node<K, V> node) {
-        while (node != null && node.parent != null && node.entrySize() < minKeys) {
+        while (node != null && node != root && node.entrySize() < minKeys) {
             int index = node.parent.indexOf(node);
             Entry<K, V> entry = node.parent.getEntry(index - 1);
 

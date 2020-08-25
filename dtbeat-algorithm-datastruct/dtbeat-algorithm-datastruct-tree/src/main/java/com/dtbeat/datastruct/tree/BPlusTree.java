@@ -26,8 +26,10 @@ import java.util.stream.Collectors;
  * @version Id:: BPlusTree.java, v0.0.1 2020/8/24 21:57 dtbeat.com $
  */
 public class BPlusTree<K, V> implements Serializable {
-    private static final Logger LOG = LoggerFactory.getLogger(BPlusTree.class);
     private static final long serialVersionUID = 5455061436401372989L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(BPlusTree.class);
+    private static final int DEFAULT_DEGREE = 3;
 
     private int degree;
     private int minKeys;
@@ -41,8 +43,8 @@ public class BPlusTree<K, V> implements Serializable {
     }
 
     public BPlusTree(int degree, Comparator<? super K> comparator) {
-        if (degree < 2) {
-            throw new IllegalArgumentException("the degree must be equal or greater than " + 2);
+        if (degree < DEFAULT_DEGREE) {
+            throw new IllegalArgumentException("the degree must be equal or greater than " + DEFAULT_DEGREE);
         }
 
         this.degree = degree;
@@ -112,6 +114,175 @@ public class BPlusTree<K, V> implements Serializable {
         return null;
     }
 
+    public V remove(K key) {
+        FindKey<K, V> findKey = find(key);
+        if (findKey == null) {
+            return null;
+        }
+
+        V oldValue = findKey.entry.value;
+        if (!findKey.node.isLeaf()) {
+            oldValue = find(findKey.right, key).entry.value;
+        }
+
+        deleteEntry(findKey);
+
+        return oldValue;
+    }
+
+    private void deleteEntry(FindKey<K, V> findKey) {
+        size--;
+
+        if (!findKey.node.isLeaf()) {
+            // left-most right node of the node
+            // s has not left child
+            FindKey<K, V> findLeafKey = find(findKey.right, findKey.entry.key);
+            FindKey<K, V> s = successorOrPrecursor(findLeafKey);
+            findKey.entry.key = s.entry.key;
+            findKey = findLeafKey;
+        }
+
+        findKey.node.removeEntry(findKey.entry);
+        if (findKey.node.parent == null && findKey.node.isLeaf() && findKey.node.entrySize() == 0) {
+            root = null;
+        } else {
+            fixAfterDeletion(findKey.node);
+        }
+    }
+
+    private void fixAfterDeletion(Node<K, V> node) {
+        while (node != null && node != root && node.entrySize() < minKeys) {
+            int index = node.parent.indexOf(node);
+
+            // left node, right node
+            Node<K, V> leftNode = index == 0 ? null : node.parent.getChild(index - 1);
+            Node<K, V> rightNode = node.parent.getChild(index + 1);
+
+            if ((leftNode == null || leftNode.entrySize() <= minKeys)
+                    && node.entrySize() <= minKeys && (rightNode == null || rightNode.entrySize() <= minKeys)) {
+                // left and right
+                Node<K, V> left = leftNode == null ? node : leftNode;
+                Node<K, V> right = rightNode == null || leftNode != null ? node : rightNode;
+                Entry<K, V> entry = right.parent.getEntry(right.parent.indexOf(right) - 1);
+
+                // entry
+                if (!left.isLeaf()) {
+                    left.add(entry);
+                }
+                right.entries.forEach(e -> left.add(e));
+
+                // child
+                right.children.forEach(child -> left.add(child));
+                right.children.forEach(child -> child.parent = left);
+
+                // remove entry and right child
+                right.parent.removeEntry(entry);
+                right.parent.removeChild(right.parent.indexOf(right));
+
+                // double-linked list
+                if (left.isLeaf()) {
+                    LeafNode<K, V> rightLeaf = (LeafNode<K, V>) right;
+                    LeafNode<K, V> leftLeaf = (LeafNode<K, V>) left;
+
+                    leftLeaf.next = rightLeaf.next;
+                    if (rightLeaf.next != null) {
+                        rightLeaf.next.previous = leftLeaf;
+                    }
+                }
+
+                if (node.parent.parent == null && node.parent.entrySize() == 0) {
+                    root.clear();
+                    root = left;
+                    root.parent = null;
+                }
+
+                node = left;
+            } else {
+                // left and right
+                Node<K, V> left = leftNode != null && leftNode.entrySize() > minKeys ? leftNode : node;
+                Node<K, V> right = left == node ? rightNode : node;
+                Entry<K, V> entry = right.parent.getEntry(right.parent.indexOf(right) - 1);
+
+                Entry<K, V> borrowedEntry = left.entrySize() > minKeys ? left.lastEntry() : right.firstEntry();
+                Node<K, V> borrowedChild = left.entrySize() > minKeys ? left.lastNode() : right.firstNode();
+                Node<K, V> targetNode = left.entrySize() > minKeys ? right : left;
+                Node<K, V> borrowedNode = left.entrySize() > minKeys ? left : right;
+
+                if (targetNode.isLeaf()) {
+                    targetNode.add(borrowedEntry);
+                    borrowedNode.removeEntry(borrowedEntry);
+                    entry.key = borrowedNode.firstEntry().key;
+                } else {
+                    targetNode.add(new Entry<>(entry.key, null));
+                    targetNode.add(borrowedChild);
+                    borrowedChild.parent = targetNode;
+                    borrowedNode.removeEntry(borrowedEntry);
+                    borrowedNode.removeChild(borrowedChild);
+                    entry.key = borrowedEntry.key;
+                }
+            }
+
+            node = node.parent;
+        }
+    }
+
+
+    /**
+     * Returns the successor or precursor of the special key.
+     *
+     * @param findKey the key info
+     * @return the successor of the special key.
+     */
+    private FindKey<K, V> successorOrPrecursor(FindKey<K, V> findKey) {
+        if (findKey == null) {
+            return null;
+        }
+
+        if (!findKey.node.isLeaf()) {
+            findKey = find(findKey.right, findKey.entry.key);
+        }
+
+        LeafNode node = (LeafNode) findKey.node;
+
+        int index = node.indexOf(findKey.entry);
+        if (index < node.entrySize() - 1) {
+            return new FindKey<>(node, node.getEntry(index + 1), null, null);
+        } else if (node.next != null && node.next.parent == node.parent) {
+            return new FindKey<>(node.next, node.next.firstEntry(), null, null);
+        } else {
+            return new FindKey<>(node.previous, node.previous.lastEntry(), null, null);
+        }
+    }
+
+    private FindKey<K, V> find(K key) {
+        return find(root, key);
+    }
+
+    private FindKey<K, V> find(Node<K, V> node, K key) {
+        Node<K, V> t = node;
+        if (null == t) {
+            return null;
+        }
+
+        do {
+            Node<K, V> cur = t;
+            for (int i = 0; i < cur.entrySize(); i++) {
+                Entry<K, V> entry = cur.getEntry(i);
+                int cmp = compare(key, entry.key);
+                if (cmp < 0) {
+                    t = cur.getChild(i);
+                    break;
+                } else if (cmp > 0) {
+                    t = cur.getChild(i + 1);
+                } else {
+                    return new FindKey<>(cur, entry, cur.getChild(i), cur.getChild(i + 1));
+                }
+            }
+        } while (t != null);
+
+        return null;
+    }
+
     private void fixAfterInsertion(Node<K, V> node) {
         while (node != null && node.isSpill()) {
             Node<K, V> parent = node.parent;
@@ -134,46 +305,40 @@ public class BPlusTree<K, V> implements Serializable {
         // the entry for moving up
         Entry<K, V> middleEntry = child.getEntry(entrySize / 2);
 
-        if (child instanceof LeafNode) {
-            // right node
-            int rightEntrySplitStartIndex = entrySize > 0 ? entrySize / 2 : 0;
-            int rightNodeSplitStartIndex = childSize > 0 ? (int) Math.ceil(childSize * 1.0 / 2) : 0;
-
-            List<Entry<K, V>> rightEntries = new ArrayList<>(child.entries.subList(rightEntrySplitStartIndex, entrySize));
-            List<Node<K, V>> rightChildren = new ArrayList<>(child.children.subList(rightNodeSplitStartIndex, childSize));
-            LeafNode<K, V> rightNode = new LeafNode<K, V>(parent, rightEntries, rightChildren);
-            rightChildren.forEach(r -> r.parent = rightNode);
-
-            // right node
-            child.truncate(entrySize / 2);
-            LeafNode<K, V> leftNode = LeafNode.class.cast(child);
-            leftNode.children.forEach(l -> l.parent = leftNode);
-            
-            // pre-next
-            rightNode.next = leftNode.next;
-            rightNode.previous = leftNode;
-            leftNode.next = rightNode;
-
-            parent.add(middleEntry);
-            parent.add(rightNode);
+        // right start index for sub-entries and sub-children
+        int rightEntryStartIndex;
+        int rightChildNodeStartIndex;
+        if (child.isLeaf()) {
+            rightEntryStartIndex = entrySize > 0 ? entrySize / 2 : 0;
+            rightChildNodeStartIndex = 0;
         } else {
-            // right node
-            int rightEntrySplitStartIndex = entrySize > 0 ? entrySize / 2 + 1 : 0;
-            int rightNodeSplitStartIndex = childSize > 0 ? (int) Math.ceil(childSize * 1.0 / 2) : 0;
-
-            List<Entry<K, V>> rightEntries = new ArrayList<>(child.entries.subList(rightEntrySplitStartIndex, entrySize));
-            List<Node<K, V>> rightChildren = new ArrayList<>(child.children.subList(rightNodeSplitStartIndex, childSize));
-            Node<K, V> rightNode = new InternalNode<K, V>(parent, rightEntries, rightChildren);
-            rightChildren.forEach(r -> r.parent = rightNode);
-
-            // right node
-            child.truncate(entrySize / 2);
-            Node<K, V> leftNode = child;
-            leftNode.children.forEach(l -> l.parent = leftNode);
-
-            parent.add(middleEntry);
-            parent.add(rightNode);
+            rightEntryStartIndex = entrySize / 2 + 1;
+            rightChildNodeStartIndex = (int) Math.ceil(childSize * 1.0 / 2);
         }
+
+        // right node
+        List<Entry<K, V>> rightEntries = new ArrayList<>(child.entries.subList(rightEntryStartIndex, entrySize));
+        List<Node<K, V>> rightChildren = new ArrayList<>(child.children.subList(rightChildNodeStartIndex, childSize));
+        Node<K, V> right = child.isLeaf() ? new LeafNode<K, V>(parent, rightEntries, rightChildren) : new InternalNode<K, V>(parent, rightEntries, rightChildren);
+        rightChildren.forEach(r -> r.parent = right);
+
+        // left node
+        child.truncate(entrySize / 2);
+        Node<K, V> left = child;
+
+        // double-linked list
+        if (child.isLeaf()) {
+            LeafNode<K, V> rightLeaf = (LeafNode<K, V>) right;
+            LeafNode<K, V> leftLeaf = (LeafNode<K, V>) left;
+
+            rightLeaf.next = leftLeaf.next;
+            rightLeaf.previous = leftLeaf;
+            leftLeaf.next = rightLeaf;
+        }
+
+        // add middleEntry and right node to parent
+        parent.add(new Entry<>(middleEntry.key, null));
+        parent.add(right);
     }
 
     final LeafNode<K, V> findMin() {
@@ -235,17 +400,35 @@ public class BPlusTree<K, V> implements Serializable {
         int index = node.parent.indexOf(node);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("node:{} node.parent:{} index: {} entrySize: {} childSize: {}",node, node.parent, index, node.parent.entrySize(), node.parent.childSize());
+            LOG.debug("node:{} node.parent:{} index: {} entrySize: {} childSize: {}", node, node.parent, index, node.parent.entrySize(), node.parent.childSize());
         }
 
         if (index == 0) {
             return "left-parent: null right-parent: " + node.parent.getEntry(index).key;
-        } else if(index == node.parent.childSize() - 1) {
+        } else if (index == node.parent.childSize() - 1) {
             return "left-parent: " + node.parent.getEntry(index - 1).key + " right-parent: null";
         } else {
             return "left-parent: " + node.parent.getEntry(index - 1).key + " right-parent: " + node.parent.getEntry(index).key;
         }
     }
+
+    /**
+     * FindNode is an result for finding by key
+     */
+    private class FindKey<K, V> {
+        private Node<K, V> node;
+        private Entry<K, V> entry;
+        private Node<K, V> left;
+        private Node<K, V> right;
+
+        public FindKey(Node<K, V> node, Entry<K, V> entry, Node<K, V> left, Node<K, V> right) {
+            this.node = node;
+            this.entry = entry;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
 
     /**
      * Leaf Node

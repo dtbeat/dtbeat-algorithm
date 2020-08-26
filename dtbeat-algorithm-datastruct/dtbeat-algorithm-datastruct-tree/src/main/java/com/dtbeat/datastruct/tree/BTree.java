@@ -149,67 +149,60 @@ public class BTree<K, V> implements Serializable {
     private void fixAfterDeletion(Node<K, V> node) {
         while (node != null && node != root && node.entrySize() < minKeys) {
             int index = node.parent.indexOf(node);
-            Entry<K, V> entry = node.parent.getEntry(index - 1);
 
-            Node<K, V> leftNode;
-            if (index == 0) {
-                entry = node.parent.getEntry(index);
-                leftNode = node;
-                node = node.parent.getChild(index + 1);
-            } else {
-                leftNode = node.parent.getChild(index - 1);
-            }
+            // left node, right node
+            Node<K, V> leftNode = index == 0 ? null : node.parent.getChild(index - 1);
+            Node<K, V> rightNode = node.parent.getChild(index + 1);
 
-            // can`t borrow and merge
-            if (leftNode.entrySize() <= minKeys && node.entrySize() <= minKeys) {
-                leftNode.add(entry);
-                node.entries.forEach(e -> leftNode.add(e));
-                node.children.forEach(child -> leftNode.add(child));
-                leftNode.children.forEach(child -> child.parent = leftNode);
-                node.parent.removeEntry(entry);
-                node.parent.removeChild(node.parent.indexOf(node));
+            if ((leftNode == null || leftNode.entrySize() <= minKeys)
+                    && node.entrySize() <= minKeys && (rightNode == null || rightNode.entrySize() <= minKeys)) {
+                // left and right
+                Node<K, V> left = leftNode == null ? node : leftNode;
+                Node<K, V> right = rightNode == null || leftNode != null ? node : rightNode;
+                Entry<K, V> entry = right.parent.getEntry(right.parent.indexOf(right) - 1);
+
+                // entry
+                left.add(entry);
+                right.entries.forEach(e -> left.add(e));
+
+                // child
+                right.children.forEach(child -> left.add(child));
+                right.children.forEach(child -> child.parent = left);
+
+                // remove entry and right child
+                right.parent.removeEntry(entry);
+                right.parent.removeChild(right.parent.indexOf(right));
 
                 if (node.parent.parent == null && node.parent.entrySize() == 0) {
                     root.clear();
-                    root = leftNode;
+                    root = left;
                     root.parent = null;
                 }
-                node.clear();
-                node = leftNode;
+
+                node = left;
             } else {
-                // borrow a entry from sibling to replace parent entry
-                // and parent entry move down to current node
-                Entry<K, V> borrowEntry;
-                Node<K, V> shiftNode;
-                if (leftNode.entrySize() > minKeys) {
+                // left and right
+                Node<K, V> left = leftNode != null && leftNode.entrySize() > minKeys ? leftNode : node;
+                Node<K, V> right = left == node ? rightNode : node;
+                Entry<K, V> entry = right.parent.getEntry(right.parent.indexOf(right) - 1);
 
-                    borrowEntry = leftNode.lastEntry();
-                    leftNode.removeEntry(borrowEntry);
-                    node.add(new Entry<>(entry.key, entry.value));
+                Entry<K, V> borrowedEntry = left.entrySize() > minKeys ? left.lastEntry() : right.firstEntry();
+                Node<K, V> borrowedChild = left.entrySize() > minKeys ? left.lastNode() : right.firstNode();
+                Node<K, V> targetNode = left.entrySize() > minKeys ? right : left;
+                Node<K, V> borrowedNode = left.entrySize() > minKeys ? left : right;
 
-                    if (!node.isLeaf()) {
-                        shiftNode = leftNode.lastNode();
-                        leftNode.removeChild(shiftNode);
-                        node.add(shiftNode);
-                        shiftNode.parent = node;
-                    }
+                targetNode.add(new Entry<>(entry.key, entry.value));
+                borrowedNode.removeEntry(borrowedEntry);
 
-                } else {
-
-                    borrowEntry = node.firstEntry();
-                    node.removeEntry(borrowEntry);
-                    leftNode.add(new Entry<>(entry.key, entry.value));
-
-                    if (!node.isLeaf()) {
-                        shiftNode = node.firstNode();
-                        node.removeChild(shiftNode);
-                        leftNode.add(shiftNode);
-                        shiftNode.parent = leftNode;
-                    }
+                if (!targetNode.isLeaf()) {
+                    targetNode.add(borrowedChild);
+                    borrowedChild.parent = targetNode;
+                    borrowedNode.removeEntry(borrowedEntry);
+                    borrowedNode.removeChild(borrowedChild);
                 }
 
-                entry.key = borrowEntry.key;
-                entry.value = borrowEntry.value;
+                entry.key = borrowedEntry.key;
+                entry.value = borrowedEntry.value;
             }
 
             node = node.parent;

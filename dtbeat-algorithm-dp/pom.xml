@@ -9,12 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dtbeat-algorithm-datastruct</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>dtbeat-algorithm-datastruct-tree</module>
-        <module>dtbeat-algorithm-datastruct-graph</module>
-    </modules>
+    <artifactId>dtbeat-algorithm-dp</artifactId>
 
 
 </project>

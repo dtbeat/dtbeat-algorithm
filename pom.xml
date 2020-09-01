@@ -10,6 +10,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>dtbeat-algorithm-datastruct</module>
+        <module>dtbeat-algorithm-dp</module>
     </modules>
 
     <properties>

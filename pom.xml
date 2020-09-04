@@ -11,6 +11,7 @@
     <modules>
         <module>dtbeat-algorithm-datastruct</module>
         <module>dtbeat-algorithm-dp</module>
+        <module>dtbeat-algorithm-uf</module>
     </modules>
 
     <properties>
@@ -63,6 +64,12 @@
             <artifactId>mockito-all</artifactId>
             <version>1.8.5</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dtbeat</groupId>
+            <artifactId>dtbeat-algorithm-uf</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

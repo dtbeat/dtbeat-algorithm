@@ -12,6 +12,8 @@
         <module>dtbeat-algorithm-datastruct</module>
         <module>dtbeat-algorithm-dp</module>
         <module>dtbeat-algorithm-uf</module>
+        <module>dtbeat-algorithm-sorting</module>
+        <module>dtbeat-algorithm-priority-queue</module>
     </modules>
 
     <properties>

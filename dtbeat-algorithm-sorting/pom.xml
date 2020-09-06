@@ -10,6 +10,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dtbeat-algorithm-sorting</artifactId>
-
+    <name>dtbeat sorting</name>
 
 </project>

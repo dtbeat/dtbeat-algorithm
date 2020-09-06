@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dtbeat-algorithm-datastruct</artifactId>
+    <name>dtbeat datastruct</name>
     <packaging>pom</packaging>
     <modules>
         <module>dtbeat-algorithm-datastruct-tree</module>

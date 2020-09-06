@@ -10,5 +10,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dtbeat-algorithm-datastruct-graph</artifactId>
+    <name>dtbeat datastruct graph</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dtbeat</groupId>
+            <artifactId>dtbeat-algorithm-union-find</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

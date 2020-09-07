@@ -132,6 +132,78 @@ public class PriorityQueueTest {
         }
     }
 
+    @Test
+    public void testFibonacciHeap() {
+        FibonacciHeap<Integer> q = new FibonacciHeap<>(Integer.MIN_VALUE);
+
+        List<Integer> arr = new ArrayList<>();
+        List<Integer> expected = new ArrayList<>();
+        // 88,53,79,59,2,4,3,30,12,87,5,21,80,81,50,5,14,47,56
+        Integer[] input = new Integer[]{92, 78, 66, 39, 56, 36, 49, 93, 96, 21, 26};
+
+        for (Integer v : input) {
+            if (arr.contains(v)) {
+                continue;
+            }
+            arr.add(v);
+            expected.add(v);
+        }
+
+        for (Integer v : arr) {
+            q.insert(v);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("==begin==\n" + q.render() + "\n==end==");
+        }
+
+        expected.sort(Comparator.comparingInt(Integer::intValue));
+        for (Integer v : expected) {
+            assertEquals(v.intValue(), q.extractMin().intValue());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("==begin==\n" + q.render() + "\n==end==");
+            }
+        }
+    }
+
+    @Test
+    public void testFibonacciHeapByDynamic() {
+        testFibonacciHeapDynamic(new FibonacciHeap<>(Integer.MIN_VALUE), (e1, e2) -> Integer.compare(e1, e2.intValue()));
+    }
+
+    @Test
+    public void testFibonacciHeapWith100KBatch() {
+        for (int i = 0; i < 100000; i++) {
+            testFibonacciHeapDynamic(new FibonacciHeap<>(Integer.MIN_VALUE), (e1, e2) -> Integer.compare(e1, e2.intValue()));
+            LOG.info("Auto Test: %{}", Math.round(i * 100.0 / 100000));
+        }
+    }
+
+    private void testFibonacciHeapDynamic(FibonacciHeap<Integer> q, Comparator<Integer> comparator) {
+        Random rnd = new Random();
+        int size = rnd.nextInt(1000);
+        List<Integer> arr = new ArrayList<>();
+        List<Integer> expected = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            arr.add(rnd.nextInt(100));
+            expected.add(arr.get(i));
+        }
+
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug(toString(expected));
+//        }
+
+        for (Integer v : arr) {
+            q.insert(v);
+        }
+
+        expected.sort(comparator);
+        for (Integer v : expected) {
+            assertEquals(v.intValue(), q.extractMin().intValue());
+        }
+    }
+
     private void testDynamic(PriorityQueue<Integer> q, Comparator<Integer> comparator) {
         Random rnd = new Random();
         int size = rnd.nextInt(5);

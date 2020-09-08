@@ -179,6 +179,77 @@ public class PriorityQueueTest {
         }
     }
 
+    @Test
+    public void testBinomialHeap() {
+        BinomialHeap<Integer> q = new BinomialHeap<>(Integer.MIN_VALUE);
+
+        List<Integer> arr = new ArrayList<>();
+        List<Integer> expected = new ArrayList<>();
+        Integer[] input = new Integer[]{55, 7, 62, 14, 40, 98, 44, 53};
+
+        for (Integer v : input) {
+            if (arr.contains(v)) {
+                continue;
+            }
+            arr.add(v);
+            expected.add(v);
+        }
+
+        for (Integer v : arr) {
+            q.insert(v);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("==begin==\n" + q.render() + "\n==end==");
+        }
+
+        expected.sort(Comparator.comparingInt(Integer::intValue));
+        for (Integer v : expected) {
+            assertEquals(v.intValue(), q.extractMin().intValue());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("==begin==\n" + q.render() + "\n==end==");
+            }
+        }
+    }
+
+    @Test
+    public void testBinomialHeapByDynamic() {
+        testBinomialHeapDynamic(new BinomialHeap<>(Integer.MIN_VALUE), (e1, e2) -> Integer.compare(e1, e2.intValue()));
+    }
+
+    @Test
+    public void testBinomialHeapWith100KBatch() {
+        for (int i = 0; i < 100000; i++) {
+            testBinomialHeapDynamic(new BinomialHeap<>(Integer.MIN_VALUE), (e1, e2) -> Integer.compare(e1, e2.intValue()));
+            LOG.info("Auto Test: %{}", Math.round(i * 100.0 / 100000));
+        }
+    }
+
+    private void testBinomialHeapDynamic(BinomialHeap<Integer> q, Comparator<Integer> comparator) {
+        Random rnd = new Random();
+        int size = rnd.nextInt(1000);
+        List<Integer> arr = new ArrayList<>();
+        List<Integer> expected = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+            arr.add(rnd.nextInt(100));
+            expected.add(arr.get(i));
+        }
+
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug(toString(expected));
+//        }
+
+        for (Integer v : arr) {
+            q.insert(v);
+        }
+
+        expected.sort(comparator);
+        for (Integer v : expected) {
+            assertEquals(v.intValue(), q.extractMin().intValue());
+        }
+    }
+
     private void testFibonacciHeapDynamic(FibonacciHeap<Integer> q, Comparator<Integer> comparator) {
         Random rnd = new Random();
         int size = rnd.nextInt(1000);

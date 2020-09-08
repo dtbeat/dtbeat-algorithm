@@ -15,6 +15,9 @@
         <module>dtbeat-algorithm-union-find</module>
         <module>dtbeat-algorithm-sorting</module>
         <module>dtbeat-algorithm-priority-queue</module>
+        <module>dtbeat-algorithm-stack</module>
+        <module>dtbeat-algorithm-double-pointer</module>
+        <module>dtbeat-algorithm-linked-list</module>
     </modules>
 
     <properties>

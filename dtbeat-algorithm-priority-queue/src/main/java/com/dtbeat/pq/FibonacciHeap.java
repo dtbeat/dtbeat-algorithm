@@ -46,6 +46,17 @@ public class FibonacciHeap<E> {
         FibonacciHeap<E> t = new FibonacciHeap<>(this.MIN_KEY, comparator);
         t.min = h1.min;
 
+        // concat
+        if(h2.min != null) {
+            Node x = h2.min;
+            t.insert(x);
+
+            while (x.left != h2.min) {
+                x = x.left;
+                t.insert(x);
+            }
+        }
+
         if (h1.min == null || (h2.min != null && compare(h1.min.key, h2.min.key) >= 0)) {
             t.min = h2.min;
         }

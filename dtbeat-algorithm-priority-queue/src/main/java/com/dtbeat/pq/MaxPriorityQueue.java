@@ -22,6 +22,6 @@ public class MaxPriorityQueue<E> extends PriorityQueue<E> {
     }
 
     public MaxPriorityQueue(int capacity, Comparator<E> comparator) {
-        super(new MaxHeap<>(capacity, comparator));
+        super(new MaxBinaryHeap<>(capacity, comparator));
     }
 }

@@ -1,6 +1,5 @@
 package com.dtbeat.pq;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 /**
@@ -10,9 +9,9 @@ import java.util.Objects;
  * @version Id: MaxPriorityQueue.java, v0.0.1 2020/9/6 13:54 dtbeat.com $
  */
 public class PriorityQueue<E> {
-    private BaseHeap<E> heap;
+    private BaseBinaryHeap<E> heap;
 
-    public PriorityQueue(BaseHeap<E> heap) {
+    public PriorityQueue(BaseBinaryHeap<E> heap) {
         this.heap = Objects.requireNonNull(heap);
     }
 

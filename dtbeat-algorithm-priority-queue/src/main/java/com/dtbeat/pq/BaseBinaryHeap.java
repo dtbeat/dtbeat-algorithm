@@ -9,23 +9,23 @@ import java.util.Comparator;
  * @author elvinshang
  * @version Id: MaxHeap.java, v0.0.1 2020/9/6 11:52 dtbeat.com $
  */
-public abstract class BaseHeap<E> {
+public abstract class BaseBinaryHeap<E> {
     private ArrayList<E> data;
     private Comparator<E> comparator;
 
-    public BaseHeap() {
+    public BaseBinaryHeap() {
         this(-1);
     }
 
-    public BaseHeap(int capacity) {
+    public BaseBinaryHeap(int capacity) {
         this(-1, null);
     }
 
-    public BaseHeap(Comparator<E> comparator) {
+    public BaseBinaryHeap(Comparator<E> comparator) {
         this(-1, comparator);
     }
 
-    public BaseHeap(int capacity, Comparator<E> comparator) {
+    public BaseBinaryHeap(int capacity, Comparator<E> comparator) {
         this.data = capacity <= 0 ? new ArrayList<>() : new ArrayList<>(capacity);
         this.comparator = comparator;
     }

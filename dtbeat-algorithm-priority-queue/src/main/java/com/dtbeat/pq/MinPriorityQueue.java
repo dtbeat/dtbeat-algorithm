@@ -22,6 +22,6 @@ public class MinPriorityQueue<E> extends PriorityQueue<E> {
     }
 
     public MinPriorityQueue(int capacity, Comparator<E> comparator) {
-        super(new MinHeap<>(capacity, comparator));
+        super(new MinBinaryHeap<>(capacity, comparator));
     }
 }

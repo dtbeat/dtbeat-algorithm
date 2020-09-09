@@ -21,6 +21,7 @@
         <module>dtbeat-algorithm-linked-list</module>
         <module>dtbeat-algorithm-segment-tree</module>
         <module>dtbeat-algorithm-lang</module>
+        <module>dtbeat-algorithm-greedy</module>
     </modules>
 
     <properties>

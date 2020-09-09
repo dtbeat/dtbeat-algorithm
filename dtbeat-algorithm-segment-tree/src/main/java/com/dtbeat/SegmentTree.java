@@ -156,14 +156,13 @@ public class SegmentTree<E> {
         while (!q.isEmpty()) {
             Node x = q.poll();
 
-            int mid = (int) Math.floor((x.right - x.left + 1) * 1.0 / 2);
-            Node lchild = new Node(x.left, x.left + mid - 1);
+            Node lchild = new Node(x.left, (x.left + x.right) / 2);
             insertLeftChild(lchild, x);
             if (lchild.getSize() > 1) {
                 q.offer(lchild);
             }
 
-            Node rchild = new Node(x.left + mid, x.right);
+            Node rchild = new Node((x.left + x.right) / 2 + 1, x.right);
             insertRightChild(rchild, x);
             if (rchild.getSize() > 1) {
                 q.offer(rchild);

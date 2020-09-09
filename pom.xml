@@ -19,6 +19,8 @@
         <module>dtbeat-algorithm-stack</module>
         <module>dtbeat-algorithm-double-pointer</module>
         <module>dtbeat-algorithm-linked-list</module>
+        <module>dtbeat-algorithm-segment-tree</module>
+        <module>dtbeat-algorithm-lang</module>
     </modules>
 
     <properties>
@@ -78,6 +80,11 @@
             <dependency>
                 <groupId>com.dtbeat</groupId>
                 <artifactId>dtbeat-algorithm-union-find</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dtbeat</groupId>
+                <artifactId>dtbeat-algorithm-lang</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

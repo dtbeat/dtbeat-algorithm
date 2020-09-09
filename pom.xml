@@ -10,7 +10,8 @@
     <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>dtbeat-algorithm-datastruct</module>
+        <module>dtbeat-algorithm-tree</module>
+        <module>dtbeat-algorithm-graph</module>
         <module>dtbeat-algorithm-dynamic-programming</module>
         <module>dtbeat-algorithm-union-find</module>
         <module>dtbeat-algorithm-sorting</module>

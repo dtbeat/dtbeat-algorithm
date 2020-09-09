@@ -9,7 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dtbeat-algorithm-double-pointer</artifactId>
-    <name>dtbeat double pointer</name>
+    <artifactId>dtbeat-algorithm-graph</artifactId>
+    <name>dtbeat graph</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.dtbeat</groupId>
+            <artifactId>dtbeat-algorithm-union-find</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -23,7 +23,7 @@ public class TireTreeTest {
             LOG.debug(tree.render());
         }
 
-        assertEquals("[TireTree [a:false [b:false [e:true] [c:true [d:true [e:true]]]]] [b:false [c:false [d:true]]] [h:false [i:false [j:false [k:true]]]]]", tree.render());
+        assertEquals("[TireTree [h:false [i:false [j:false [k:true]]]] [b:false [c:false [d:true]]] [a:false [b:false [e:true] [c:true [d:true [e:true]]]]]]", tree.render());
     }
 
     @Test
@@ -36,16 +36,16 @@ public class TireTreeTest {
         tree.insert("bcd");
         tree.insert("hijk");
 
-        assertEquals("[TireTree [a:false [b:false [e:true] [c:true [d:true [e:true]]]]] [b:false [c:false [d:true]]] [h:false [i:false [j:false [k:true]]]]]", tree.render());
+        assertEquals("[TireTree [h:false [i:false [j:false [k:true]]]] [b:false [c:false [d:true]]] [a:false [b:false [e:true] [c:true [d:true [e:true]]]]]]", tree.render());
 
         tree.delete("abcd");
-        assertEquals("[TireTree [a:false [b:false [e:true] [c:true [d:false [e:true]]]]] [b:false [c:false [d:true]]] [h:false [i:false [j:false [k:true]]]]]", tree.render());
+        assertEquals("[TireTree [h:false [i:false [j:false [k:true]]]] [b:false [c:false [d:true]]] [a:false [b:false [e:true] [c:true [d:false [e:true]]]]]]", tree.render());
 
         tree.delete("abcde");
-        assertEquals("[TireTree [a:false [b:false [e:true] [c:true]]] [b:false [c:false [d:true]]] [h:false [i:false [j:false [k:true]]]]]", tree.render());
+        assertEquals("[TireTree [h:false [i:false [j:false [k:true]]]] [b:false [c:false [d:true]]] [a:false [b:false [e:true] [c:true]]]]", tree.render());
 
         tree.delete("bcd");
-        assertEquals("[TireTree [a:false [b:false [e:true] [c:true]]] [h:false [i:false [j:false [k:true]]]]]", tree.render());
+        assertEquals("[TireTree [h:false [i:false [j:false [k:true]]]] [a:false [b:false [e:true] [c:true]]]]", tree.render());
     }
 
     @Test
@@ -58,7 +58,7 @@ public class TireTreeTest {
         tree.insert("bcd");
         tree.insert("hijk");
 
-        assertEquals("[TireTree [a:false [b:false [e:true] [c:true [d:true [e:true]]]]] [b:false [c:false [d:true]]] [h:false [i:false [j:false [k:true]]]]]", tree.render());
+        assertEquals("[TireTree [h:false [i:false [j:false [k:true]]]] [b:false [c:false [d:true]]] [a:false [b:false [e:true] [c:true [d:true [e:true]]]]]]", tree.render());
 
         boolean actual = tree.find("abcd");
         assertEquals(true, actual);

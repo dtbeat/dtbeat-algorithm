@@ -12,10 +12,10 @@ import java.util.function.Consumer;
  * @version Id: TireTree.java, v0.0.1 2020/9/10 17:25 dtbeat.com $
  */
 public class TireTree {
-    private List<Node> heads;
+    private Node root;
 
     public TireTree() {
-        heads = new ArrayList<>();
+        root = new Node('\0');
     }
 
     /**
@@ -32,7 +32,7 @@ public class TireTree {
         Node head = findHead(chars[0]);
         if (head == null) {
             head = createNode(chars);
-            heads.add(head);
+            insert(head, root);
             return;
         }
 
@@ -127,9 +127,7 @@ public class TireTree {
     public String render() {
         StringBuilder writer = new StringBuilder();
         writer.append("[TireTree");
-        for (Node head : heads) {
-            writer.append(" " + head.render());
-        }
+        foreachChild(this.root, node -> writer.append(" " + node.render()));
         writer.append("]");
 
         return writer.toString();
@@ -137,7 +135,6 @@ public class TireTree {
 
     private void removeNode(Node node) {
         if (node.parent == null) {
-            this.heads.remove(node);
             return;
         }
 
@@ -205,10 +202,13 @@ public class TireTree {
     }
 
     private Node findHead(char c) {
-        for (Node node : heads) {
-            if (node.c == c) {
-                return node;
+        Node sibling = root.child;
+        while (sibling != null) {
+            if (sibling.c == c) {
+                return sibling;
             }
+
+            sibling = sibling.sibling;
         }
 
         return null;

@@ -23,6 +23,7 @@
         <module>dtbeat-algorithm-lang</module>
         <module>dtbeat-algorithm-greedy</module>
         <module>dtbeat-algorithm-divide-and-conquer</module>
+        <module>dtbeat-algorithm-string-matching</module>
     </modules>
 
     <properties>

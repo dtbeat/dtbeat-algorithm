@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>dtbeat-algorithm-union-find</artifactId>
-    <name>dtbeat union find set</name>
+    <artifactId>dtbeat-algorithm-suffix-tree</artifactId>
+    <name>dtbeat suffix tree</name>
 
 </project>

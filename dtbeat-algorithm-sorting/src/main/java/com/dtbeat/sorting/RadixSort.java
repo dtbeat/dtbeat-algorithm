@@ -22,56 +22,47 @@ public class RadixSort {
             return;
         }
 
-        OptionalInt min = Arrays.stream(arr).min();
-        if (!min.isPresent()) {
-            throw new IllegalArgumentException("arr");
-        }
-        int compensation = min.getAsInt() < 0 ? -min.getAsInt() : 0;
+        final int N = arr.length;
+        final int R = 10;
+        int[] aux = new int[N];
 
-        State[] r = new State[10];
-        int c = 1;
-        boolean flag = false;
-        while (!flag) {
-            flag = true;
-            for (int i = 0; i < arr.length; i++) {
-                int v = arr[i] + compensation;
-                int divisor = v / c;
-                int remainder = divisor % 10;
-                flag = flag && (divisor == 0 || divisor / 10 == 0);
+        int div = 1;
+        while (true) {
+            int[] counts = new int[R + 1];
+            boolean flag = false;
 
-                State s = r[remainder];
-                if (s == null) {
-                    r[remainder] = new State(v, null);
-                } else {
-                    while (s.next != null) {
-                        s = s.next;
-                    }
-
-                    s.next = new State(v, null);
+            // frequency
+            for (int i = 0; i < N; i++) {
+                int r = (arr[i] / div);
+                int b = (r % 10);
+                if(r > 0) {
+                    flag = true;
                 }
+
+                counts[b + 1]++;
             }
 
-            int k = 0;
-            for (int i = 0; i < r.length; i++) {
-                State state = r[i];
-                while (state != null) {
-                    arr[k++] = state.v - compensation;
-                    state = state.next;
-                }
-                r[i] = null;
+            if (!flag) {
+                break;
             }
 
-            c = c * 10;
-        }
-    }
+            // frequency to index
+            for (int i = 0; i < R; i++) {
+                counts[i + 1] += counts[i];
+            }
 
-    private static class State {
-        int v;
-        State next;
+            // class
+            for (int i = 0; i < N; i++) {
+                int b = (arr[i] / div % 10);
+                aux[counts[b]++] = arr[i];
+            }
 
-        public State(int v, State next) {
-            this.v = v;
-            this.next = next;
+            // rewrite
+            for (int i = 0; i < N; i++) {
+                arr[i] = aux[i];
+            }
+
+            div *= 10;
         }
     }
 }

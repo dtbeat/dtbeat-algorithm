@@ -121,12 +121,12 @@ public class SortingTest {
 
     @Test
     public void testRadixSort() {
-        int[] arr = new int[]{42, 20, 17, 13, 28, 14, 23, 15};
+        int[] arr = new int[]{90,60};
         RadixSort.sort(arr);
-        assertArrayEquals(new int[]{13, 14, 15, 17, 20, 23, 28, 42}, arr);
+        assertArrayEquals(new int[]{60,90}, arr);
     }
 
-    @Ignore
+    @Test
     public void testRadixSortByDynamic() {
         Random rnd = new Random();
         for (int i = 0; i < 100000; i++) {
@@ -140,9 +140,13 @@ public class SortingTest {
                 expected[j] = arr[j];
                 o[j] = arr[j];
             }
+//            LOG.debug(Utils.toString(expected));
+
 
             Arrays.sort(expected);
             RadixSort.sort(arr);
+//            LOG.debug(Utils.toString(expected));
+//            LOG.debug(Utils.toString(arr));
             assertArrayEquals(expected, arr);
         }
     }
@@ -156,9 +160,9 @@ public class SortingTest {
 
     @Test
     public void testTimSort() {
-        int[] arr = new int[]{3,87,1,50,71,90};
+        int[] arr = new int[]{3, 87, 1, 50, 71, 90};
         TimSort.sort(arr);
-        assertArrayEquals(new int[]{1,3,50,71,87,90}, arr);
+        assertArrayEquals(new int[]{1, 3, 50, 71, 87, 90}, arr);
     }
 
     @Ignore

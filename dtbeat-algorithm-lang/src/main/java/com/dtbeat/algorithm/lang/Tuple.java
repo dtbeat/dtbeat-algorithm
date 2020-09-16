@@ -25,6 +25,14 @@ public class Tuple<T1, T2> {
         return t2;
     }
 
+    public void setT1(T1 t1) {
+        this.t1 = t1;
+    }
+
+    public void setT2(T2 t2) {
+        this.t2 = t2;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

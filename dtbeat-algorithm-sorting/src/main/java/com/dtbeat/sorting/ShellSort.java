@@ -46,15 +46,15 @@ public class ShellSort {
             return;
         }
 
-        int increment = arr.length / 2;
+        int increment = arr.length >> 1;
         while (increment > 0) {
-            for (int k = 0; k < increment; k++) {
-                for (int i = k + increment; i < arr.length; i += increment) {
-                    for (int j = i; j > k; j -= increment) {
-                        if (arr[j] < arr[j - increment]) {
-                            int t = arr[j - increment];
-                            arr[j - increment] = arr[j];
-                            arr[j] = t;
+            for (int i = 0; i < increment; i++) {
+                for (int j = i + increment; j < arr.length; j += increment) {
+                    for (int k = j; k > i; k -= increment) {
+                        if (arr[k] < arr[k - increment]) {
+                            int tmp = arr[k];
+                            arr[k] = arr[k - increment];
+                            arr[k - increment] = tmp;
                         } else {
                             break;
                         }
@@ -62,7 +62,7 @@ public class ShellSort {
                 }
             }
 
-            increment = increment / 2;
+            increment = increment >> 1;
         }
     }
 }

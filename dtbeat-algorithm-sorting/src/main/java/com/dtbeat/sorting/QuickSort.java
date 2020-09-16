@@ -115,6 +115,99 @@ public class QuickSort {
         }
     }
 
+    public static void sortByRecursion(int[] arr) {
+        sortByRecursion(arr, 0, arr.length - 1);
+    }
+
+    public static void sortByRecursion(int[] arr, int start, int end) {
+        if (start >= end) {
+            return;
+        }
+
+        int l = start;
+        int r = end;
+        int key = arr[end];
+
+        while (l < r) {
+            while (l < r && arr[l] < key) {
+                l++;
+            }
+
+            if (l < r) {
+                arr[r] = arr[l];
+                r--;
+            }
+
+            while (l < r && arr[r] >= key) {
+                r--;
+            }
+
+            if (l < r) {
+                arr[l] = arr[r];
+            }
+        }
+
+        arr[l] = key;
+        sortByRecursion(arr, start, l - 1);
+        sortByRecursion(arr, l + 1, end);
+    }
+
+    public static void sortWithDualPivotByRecursion(int[] arr) {
+        sortWithDualPivotByRecursion(arr, 0, arr.length - 1);
+    }
+
+    public static void sortWithDualPivotByRecursion(int[] arr, int start, int end) {
+        if (start >= end) {
+            return;
+        }
+
+        int min = Math.min(arr[start], arr[end]);
+        int max = Math.max(arr[start], arr[end]);
+        int e = start + 1;
+        int g = end - 1;
+        int k = e;
+
+        while (k <= g) {
+            if (arr[k] < min) {
+                int tmp = arr[k];
+                arr[k] = arr[e];
+                arr[e] = tmp;
+                e++;
+            } else if(arr[k] >= max) {
+                while (k < g && arr[g] > max) {
+                    g--;
+                }
+
+                int tmp = arr[k];
+                arr[k] = arr[g];
+                arr[g] = tmp;
+                g--;
+
+                if (arr[k] < min) {
+                    tmp = arr[k];
+                    arr[k] = arr[e];
+                    arr[e] = tmp;
+                    e++;
+                }
+            }
+
+            k++;
+        }
+
+        e = e - 1;
+        g = g + 1;
+
+        arr[start] = arr[e];
+        arr[e] = min;
+
+        arr[end] = arr[g];
+        arr[g] = max;
+
+        sortWithDualPivotByRecursion(arr, start, e - 1);
+        sortWithDualPivotByRecursion(arr, e + 1, g - 1);
+        sortWithDualPivotByRecursion(arr, g + 1, end);
+    }
+
     private static class State {
         int r;
         int l;

@@ -1,273 +1,265 @@
 package com.dtbeat;
 
-import java.util.Objects;
-import java.util.function.Consumer;
+import com.dtbeat.algorithm.lang.Tuple;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Stack;
 
 /**
- * Trie Tree
+ * Tire Search Tree
  *
  * @author elvinshang
- * @version Id: com.dtbeat.TireTree.java, v0.0.1 2020/9/10 17:25 dtbeat.com $
+ * @version Id: TireST.java, v0.0.1 2020/9/17 10:56 dtbeat.com $
  */
-public class TrieTree {
+public class TrieTree<V> {
+    private static final int R = 256;
     private Node root;
+    private int size;
 
     public TrieTree() {
-        root = new Node('\0');
+        this.root = null;
+        this.size = 0;
     }
 
-    /**
-     * Inserts new word.
-     *
-     * @param word the word to insert
-     */
-    public void insert(String word) {
-        if (word == null || word.isEmpty()) {
-            throw new IllegalArgumentException("word");
-        }
+    public V get(String key) {
+        Node node = getNode(key);
 
-        char[] chars = word.toCharArray();
-        Node head = findHead(chars[0]);
-        if (head == null) {
-            head = createNode(chars);
-            insert(head, root);
+        return node == null ? null : (V) node.val;
+    }
+
+    public void put(String key, V value) {
+        if (key == null || key.isEmpty()) {
             return;
         }
 
-        Node current = head;
-        for (int i = 1; i < chars.length; i++) {
-            char c = chars[i];
-            Node child = findChild(current, c);
-            if (child == null) {
-                child = new Node(c);
-                insert(child, current);
+        if (root == null) {
+            root = new Node();
+        }
+
+        final int N = key.length();
+        Node x = root;
+        int d = 0;
+
+        for (; d < N; d++) {
+            char c = key.charAt(d);
+
+            Node next = x.next[c];
+            if (next == null) {
+                next = new Node();
+                x.next[c] = next;
             }
 
-            current = child;
+            x = next;
         }
 
-        current.end = true;
+        x.val = value;
+        this.size++;
     }
 
-    /**
-     * Deletes the word.
-     *
-     * @param word the word to delete
-     */
-    public boolean delete(String word) {
-        char[] chars = word.toCharArray();
-        Node head = findHead(chars[0]);
-        if (head == null) {
-            return false;
-        }
-
-        Node current = head;
-        for (int i = 1; i < chars.length; i++) {
-            char c = chars[i];
-            Node child = findChild(current, c);
-            if (child == null) {
-                return false;
-            }
-
-            current = child;
-        }
-
-        if (current.child != null) {
-            current.end = false;
-        } else {
-            current = current.parent;
-            while (current != null && !current.end) {
-                Node t = current.parent;
-                removeNode(current);
-                current = t;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Returns true if the word in tree or false if none
-     *
-     * @param word the word to find
-     * @return true if the word in tree or false if none
-     */
-    public boolean find(String word) {
-        if (word == null || word.length() == 0) {
-            return false;
-        }
-
-        char[] chars = word.toCharArray();
-        Node head = findHead(chars[0]);
-        if (head == null) {
-            return false;
-        }
-
-        Node current = head;
-        for (int i = 1; i < chars.length; i++) {
-            char c = chars[i];
-            Node child = findChild(current, c);
-            if (child == null) {
-                return false;
-            }
-
-            current = child;
-        }
-
-        return true;
-    }
-
-    /**
-     * Renders formatted tree
-     *
-     * @return formatted tree
-     */
-    public String render() {
-        StringBuilder writer = new StringBuilder();
-        writer.append("[com.dtbeat.TireTree");
-        foreachChild(this.root, node -> writer.append(" " + node.render()));
-        writer.append("]");
-
-        return writer.toString();
-    }
-
-    private void removeNode(Node node) {
-        if (node.parent == null) {
+    public void delete(String key) {
+        if (this.root == null
+                || key == null
+                || key.isEmpty()) {
             return;
         }
 
-        if (node.left == null) {
-            node.parent.child = node.sibling;
+        final int N = key.length();
+        Node x = root;
+        int d = 0;
+        int p = -1;
+        Node pNode = null;
+
+        for (; d < N; d++) {
+            char c = key.charAt(d);
+            x = x.next[c];
+            if (d < N - 1 && x != null && x.val != null) {
+                p = d + 1;
+                pNode = x;
+            }
         }
 
-        if (node.sibling != null) {
-            node.sibling.left = node.left;
+        if (x == null) {
+            return;
         }
 
-        if (node.left != null) {
-            node.left.sibling = node.sibling;
+        x.val = null;
+
+        // check that has child
+        if (hasChild(x)) {
+            return;
+        }
+
+        // check that prefix is key
+        if (p != -1) {
+            pNode.next[key.charAt(p)] = null;
         }
     }
 
-    private Node createNode(char[] chars) {
-        return createNode(chars, 0);
+    public Iterable<String> keys() {
+        return keysWithPrefix("");
     }
 
-    private Node createNode(char[] chars, int start) {
-        Node res = null;
-        Node current = null;
-        for (int i = start; i < chars.length; i++) {
-            char c = chars[i];
-            if (res == null) {
-                res = new Node(c);
-                current = res;
+    public Iterable<String> keysWithPrefix(String s) {
+        Node node = getNode(s);
+        if (node == null) {
+            return null;
+        }
+
+        HashSet<String> ret = new HashSet<>();
+        int r = 0;
+        Stack<Tuple<Node, Tuple<String, Integer>>> q = new Stack<>();
+        q.push(new Tuple<>(node, new Tuple<>(s, 0)));
+
+        while (!q.isEmpty()) {
+            Tuple<Node, Tuple<String, Integer>> state = q.peek();
+            node = state.getT1();
+            s = state.getT2().getT1();
+            r = state.getT2().getT2();
+
+            // key end
+            if (node.val != null && !ret.contains(s)) {
+                ret.add(s);
+            }
+
+            // get child
+            Node child = null;
+            while (r < R && (child = node.next[r++]) == null) {
+            }
+
+            if (child != null) {
+                state.getT2().setT2(r);
+                q.push(new Tuple<>(child, new Tuple<>(s + (char) (r - 1), 0)));
             } else {
-                Node child = new Node(c);
-                insert(child, current);
-                current = child;
+                q.pop();
             }
         }
 
-        current.end = true;
-
-        return res;
+        return ret;
     }
 
-    private void insert(Node node, Node parent) {
-        node.parent = parent;
+    public Iterable<String> keysThatMatch(String s) {
+        Node node = root;
+        HashSet<String> ret = new HashSet<>();
+        int r = 0;
+        String pre = "";
+        Stack<Tuple<Node, Tuple<String, Integer>>> q = new Stack<>();
+        q.push(new Tuple<>(node, new Tuple<>(pre, 0)));
 
-        if (parent.child == null) {
-            parent.child = node;
-        } else {
-            parent.child.left = node;
-            node.sibling = parent.child;
-            parent.child = node;
-        }
-    }
+        while (!q.isEmpty()) {
+            Tuple<Node, Tuple<String, Integer>> state = q.peek();
+            node = state.getT1();
+            pre = state.getT2().getT1();
+            r = state.getT2().getT2();
+            int d = pre.length();
 
-
-    private Node findChild(Node parent, char c) {
-        Node node = parent.child;
-        while (node != null) {
-            if (node.c == c) {
-                return node;
+            // key end
+            if (node.val != null && !ret.contains(pre)) {
+                ret.add(pre);
             }
 
-            node = node.sibling;
-        }
-
-        return null;
-    }
-
-    private Node findHead(char c) {
-        Node sibling = root.child;
-        while (sibling != null) {
-            if (sibling.c == c) {
-                return sibling;
+            // check d
+            if (d == s.length()) {
+                q.pop();
+                continue;
             }
 
-            sibling = sibling.sibling;
+            // get child
+            Node child = null;
+            for (; r < R; r++) {
+                char next = s.charAt(d);
+                if (node.next[r] != null && (next == '.' || next == r)) {
+                    child = node.next[r];
+                    r++;
+                    break;
+                }
+            }
+
+            if (child != null) {
+                state.getT2().setT2(r);
+                q.push(new Tuple<>(child, new Tuple<>(pre + (char) (r - 1), 0)));
+            } else {
+                q.pop();
+            }
         }
 
-        return null;
+        return ret;
     }
 
-    private void foreachChild(Node node, Consumer<Node> consumer) {
-        Node child = node.child;
-        while (child != null) {
-            Node t = child.sibling;
-            consumer.accept(child);
-            child = t;
+    public String longestPrefixOf(String s) {
+        if (this.root == null
+                || s == null
+                || s.isEmpty()) {
+            return "";
         }
+
+        final int N = s.length();
+        Node x = root;
+        int d = 0;
+
+        for (; d < N; d++) {
+            char c = s.charAt(d);
+
+            x = x.next[c];
+            if (x == null) {
+                break;
+            }
+        }
+
+        return s.substring(0, d);
+    }
+
+    private Node getNode(String key) {
+        if (this.root == null
+                || key == null) {
+            return null;
+        }
+
+        if (key.isEmpty()) {
+            return this.root;
+        }
+
+        final int N = key.length();
+        Node x = root;
+        int d = 0;
+
+        for (; d < N; d++) {
+            char c = key.charAt(d);
+
+            x = x.next[c];
+            if (x == null) {
+                break;
+            }
+        }
+
+        return x;
+    }
+
+    private boolean hasChild(Node x) {
+        for (int i = 0; i < R; i++) {
+            if (x.next[i] != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * Trie Tree Node
+     * Trie Search Tree Node
      */
-    private class Node {
-        private char c;
-        private Node parent;
-        private Node child;
-        private Node left;
-        private Node sibling;
-        private boolean end;
+    private static class Node {
+        private Object val;
+        private Node[] next;
 
-        public Node(char c) {
-            this.c = c;
-            this.end = false;
-            this.parent = null;
-            this.left = null;
-            this.sibling = null;
-            this.child = null;
+        public Node() {
+            this(null);
         }
 
-        @Override
-        public String toString() {
-            return "charater=" + c;
-        }
-
-        public String render() {
-            StringBuilder writer = new StringBuilder();
-            writer.append("[" + c + ":" + end);
-            foreachChild(this, node -> writer.append(" " + node.render()));
-            writer.append("]");
-
-            return writer.toString();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            Node node = (Node) o;
-            return c == node.c;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(c);
+        public Node(Object val) {
+            this.val = val;
+            this.next = new Node[R];
         }
     }
 }

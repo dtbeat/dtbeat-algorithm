@@ -50,4 +50,12 @@ public class Tuple<T1, T2> {
     public int hashCode() {
         return Objects.hash(t1, t2);
     }
+
+    @Override
+    public String toString() {
+        return "Tuple{" +
+                "t1=" + t1 +
+                ", t2=" + t2 +
+                '}';
+    }
 }

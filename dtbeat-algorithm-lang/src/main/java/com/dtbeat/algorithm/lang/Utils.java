@@ -1,5 +1,7 @@
 package com.dtbeat.algorithm.lang;
 
+import java.util.function.Predicate;
+
 /**
  * Utils
  *
@@ -14,5 +16,10 @@ public class Utils {
         }
 
         return writer.length() > 0 ? writer.deleteCharAt(writer.length() - 1).toString() : writer.toString();
+    }
+
+    public static <T> void forever(Predicate<T> predicate, T t) {
+        while (predicate.test(t)) {
+        }
     }
 }

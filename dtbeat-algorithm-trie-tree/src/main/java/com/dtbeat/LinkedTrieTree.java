@@ -4,15 +4,15 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
- * Trie Tree
+ * Linked Trie Tree
  *
  * @author elvinshang
  * @version Id: com.dtbeat.TireTree.java, v0.0.1 2020/9/10 17:25 dtbeat.com $
  */
-public class TrieTreeV1 {
+public class LinkedTrieTree {
     private Node root;
 
-    public TrieTreeV1() {
+    public LinkedTrieTree() {
         root = new Node('\0');
     }
 

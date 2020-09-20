@@ -87,7 +87,7 @@ public class BoyerMoore {
             if (j == -1) {
                 lastPrefix = k;
             } else if (suffix[k] == -1 && lastPrefix != -1) {
-                suffix[k] = lastPrefix - 1;
+                suffix[i + 1] = lastPrefix - 1;
             }
         }
 
@@ -101,7 +101,7 @@ public class BoyerMoore {
 
         final int M = length();
         int x = badCharIndex - this.badChars[badChar];
-        int y = this.suffix[M - 1 - badCharIndex];
+        int y = badCharIndex < M - 1 ? (badCharIndex + 1 - this.suffix[M - 1 - badCharIndex]) : -1;
 
         return Math.max(x, y);
     }

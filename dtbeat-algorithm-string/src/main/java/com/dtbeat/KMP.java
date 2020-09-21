@@ -7,29 +7,53 @@ package com.dtbeat;
  * @version Id: KMP.java, v0.0.1 2020/9/18 22:43 dtbeat.com $
  */
 public class KMP {
+    private static final int R = 256;
+    private final String pattern;
+    private final int[] nexts;
 
+    public KMP(String pattern) {
+        this.pattern = pattern;
+        this.nexts = createNexts(pattern);
+    }
 
-    public static class DFA {
-        private static final int R = 256;
+    public int search(String s) {
+        final int N = s.length();
+        final int M = pattern.length();
 
-        private final int M;
-        private String pattern;
-        private int[][] dfa;
-
-        public DFA(String pattern) {
-            this.M = pattern.length();
-            this.pattern = pattern;
-            this.dfa = new int[R][M];
-        }
-
-        private void build() {
-            dfa[pattern.charAt(0)][0] = 1;
-            for (int x = 0, j = 1; j < M; j++) {
-                for (int c = 0; c < R; c++) {
-                    dfa[c][j] = dfa[c][x];
+        int skip = 1;
+        for (int i = 0; i < N; i += skip) {
+            int j = 0;
+            for (; j < M; j++) {
+                if (pattern.charAt(j) != s.charAt(i + j)) {
+                    skip = Math.max(1, j - nexts[j]);
+                    break;
                 }
-                x = dfa[pattern.charAt(j)][x];
+            }
+
+            if (j == M) {
+                return i;
             }
         }
+
+        return -1;
+    }
+
+    private int[] createNexts(String pattern) {
+        final int M = pattern.length();
+        int[] nexts = new int[M];
+        int j = 0;
+        for (int i = 2; i < M; i++) {
+            while (j != 0 && pattern.charAt(j) != pattern.charAt(i - 1)) {
+                j = nexts[j];
+            }
+
+            if (pattern.charAt(j) == pattern.charAt(i - 1)) {
+                j++;
+            }
+
+            nexts[i] = j;
+        }
+
+        return nexts;
     }
 }

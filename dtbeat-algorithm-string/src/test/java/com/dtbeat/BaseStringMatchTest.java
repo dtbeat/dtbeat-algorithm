@@ -58,6 +58,7 @@ public class BaseStringMatchTest {
 
     protected StringMatchCase[] mockCases() {
         StringMatchCase[] cases = {
+                new StringMatchCase("BCBAABACAABABACAA", "ABABAC"),
                 new StringMatchCase(" simple example", "example"),
                 new StringMatchCase("BEBCDAB BABCDAB CDECDAB", "BABCDAB"),
                 new StringMatchCase("ABAAAABAAAAAAAAA", "BAAAAA")

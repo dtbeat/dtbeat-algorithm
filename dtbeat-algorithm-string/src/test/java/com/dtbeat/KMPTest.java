@@ -32,4 +32,25 @@ public class KMPTest extends BaseStringMatchTest {
             assertThat(index, is(c.getIndex()));
         }
     }
+
+    @Test
+    public void testDfaSearch() {
+        StringMatchCase[] cases = mockCases();
+        for (StringMatchCase c : cases) {
+            KMP kmp = KMP.createDfa(c.getP());
+            int index = kmp.search(c.getS());
+            assertThat(index, is(c.getIndex()));
+        }
+    }
+
+    @Test
+    public void testDfaSearchByAuto() {
+        for (Iterator<StringMatchCase> it = mockCasesByAuto(); it.hasNext(); ) {
+            StringMatchCase c = it.next();
+//            LOG.debug(c.toString());
+            KMP kmp = KMP.createDfa(c.getP());
+            int index = kmp.search(c.getS());
+            assertThat(index, is(c.getIndex()));
+        }
+    }
 }

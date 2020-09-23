@@ -26,6 +26,7 @@
         <module>dtbeat-algorithm-string</module>
         <module>dtbeat-algorithm-trie-tree</module>
         <module>dtbeat-algorithm-suffix-tree</module>
+        <module>dtbeat-algorithm-huffman-coding</module>
     </modules>
 
     <properties>
@@ -90,6 +91,11 @@
             <dependency>
                 <groupId>com.dtbeat</groupId>
                 <artifactId>dtbeat-algorithm-lang</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.dtbeat</groupId>
+                <artifactId>dtbeat-algorithm-priority-queue</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -27,6 +27,7 @@
         <module>dtbeat-algorithm-trie-tree</module>
         <module>dtbeat-algorithm-suffix-tree</module>
         <module>dtbeat-algorithm-huffman-coding</module>
+        <module>dtbeat-algorithm-skip-list</module>
     </modules>
 
     <properties>

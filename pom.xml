@@ -28,6 +28,7 @@
         <module>dtbeat-algorithm-suffix-tree</module>
         <module>dtbeat-algorithm-huffman-coding</module>
         <module>dtbeat-algorithm-skip-list</module>
+        <module>dtbeat-algorithm-leetcode</module>
     </modules>
 
     <properties>

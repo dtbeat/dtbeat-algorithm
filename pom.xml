@@ -29,6 +29,7 @@
         <module>dtbeat-algorithm-huffman-coding</module>
         <module>dtbeat-algorithm-skip-list</module>
         <module>dtbeat-algorithm-leetcode</module>
+        <module>dtbeat-algorithm-double-array-trie</module>
     </modules>
 
     <properties>

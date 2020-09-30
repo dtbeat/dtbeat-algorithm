@@ -13,5 +13,8 @@ public class DoubleArrayTrieTest {
         String[] dict = {"AC", "ACE", "ACFF", "AD", "CD", "CF", "ZQ"};
         DoubleArrayTrie dat = new DoubleArrayTrie();
         dat.build(Arrays.stream(dict).collect(Collectors.toList()));
+
+        int index = dat.exactMatchSearch("ACE");
+        assertEquals(dict[index], "ACE");
     }
 }

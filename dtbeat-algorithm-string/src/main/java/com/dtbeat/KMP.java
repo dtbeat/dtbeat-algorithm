@@ -52,7 +52,8 @@ public class KMP {
         public NextsSearchEngine(String pattern, int r) {
             this.pattern = pattern;
             this.R = r;
-            this.nexts = createNexts(pattern);
+            this.nexts = getNexts(pattern);
+            //createNexts(pattern);
         }
 
         @Override
@@ -61,17 +62,48 @@ public class KMP {
             final int M = pattern.length();
 
             int i = 0, j = 0;
-            for (; i < N && j < M; i++) {
-                while (j > 0 && pattern.charAt(j) != s.charAt(i)) {
-                    j = nexts[j];
-                }
-
-                if (pattern.charAt(j) == s.charAt(i)) {
+            while (i < N && j < M) {
+                if (j == -1 || s.charAt(i) == pattern.charAt(j)) {
+                    i++;
                     j++;
+                } else {
+                    j = nexts[j];
                 }
             }
 
-            return j >= M ? i - M : -1;
+            return j == N ? i - j : -1;
+
+//            int i = 0, j = 0;
+//            for (; i < N && j < M; i++) {
+//                while (j > 0 && pattern.charAt(j) != s.charAt(i)) {
+//                    j = nexts[j];
+//                }
+//
+//                if (pattern.charAt(j) == s.charAt(i)) {
+//                    j++;
+//                }
+//            }
+//
+//            return j >= M ? i - M : -1;
+        }
+
+        private int[] getNexts(String pattern) {
+            final int M = pattern.length();
+            int[] nexts = new int[M];
+            nexts[0] = -1;
+            int i = 0, j = -1;
+
+            while (i < M - 1) {
+                if (j == -1 || pattern.charAt(i) == pattern.charAt(j)) {
+                    i++;
+                    j++;
+                    nexts[i] = j;
+                } else {
+                    j = nexts[j];
+                }
+            }
+
+            return nexts;
         }
 
         private int[] createNexts(String pattern) {

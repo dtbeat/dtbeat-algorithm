@@ -13,6 +13,14 @@ public class KMPTest extends BaseStringMatchTest {
     private static final Logger LOG = LoggerFactory.getLogger(KMPTest.class);
 
     @Test
+    public void testSearch_abababca() {
+        String parttern = "abababca";
+        KMP kmp = new KMP(parttern);
+        int index = kmp.search(parttern);
+        assertThat(index, is(0));
+    }
+
+    @Test
     public void testSearch() {
         StringMatchCase[] cases = mockCases();
         for (StringMatchCase c : cases) {

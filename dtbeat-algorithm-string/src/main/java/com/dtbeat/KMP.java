@@ -146,13 +146,13 @@ public class KMP {
             final int N = s.length();
             final int M = pattern.length();
 
-            int i = 0, j = 0;
-            for (; i < N && j < M; i++) {
-                j = dfa[s.charAt(i)][j];
-            }
+            int i = 0,  j = 0;
+            for (; i < N; i++) {
+                j = dfa[j][s.charAt(i)];
 
-            if (j == M) {
-                return i - M;
+                if(j == M) {
+                    return i - M + 1;
+                }
             }
 
             return -1;
@@ -160,16 +160,17 @@ public class KMP {
 
         private int[][] createDFA(String pattern) {
             final int M = pattern.length();
-            int[][] dfa = new int[R][M];
+            int[][] dfa = new int[M][R];
 
-            dfa[pattern.charAt(0)][0] = 1;
-            for (int i = 1, x = 0; i < M; i++) {
-                for (int j = 0; j < R; j++) {
-                    dfa[j][i] = dfa[j][x];
+            dfa[0][pattern.charAt(0)] = 1;
+            int x = 0;
+            for (int i = 1; i < M; i++) {
+                for (int c = 0; c < R; c++) {
+                    dfa[i][c] = dfa[x][c];
                 }
 
-                dfa[pattern.charAt(i)][i] = i + 1;
-                x = dfa[pattern.charAt(i)][x];
+                dfa[i][pattern.charAt(i)] = i + 1;
+                x = dfa[x][pattern.charAt(i)];
             }
 
             return dfa;

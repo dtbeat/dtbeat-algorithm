@@ -42,6 +42,14 @@ public class KMPTest extends BaseStringMatchTest {
     }
 
     @Test
+    public void testDfaSearch_ABABC() {
+        final String pattern = "ABABC";
+        KMP kmp = KMP.createDfa(pattern);
+        int index = kmp.search(pattern);
+        assertThat(index, is(0));
+    }
+
+    @Test
     public void testDfaSearch() {
         StringMatchCase[] cases = mockCases();
         for (StringMatchCase c : cases) {

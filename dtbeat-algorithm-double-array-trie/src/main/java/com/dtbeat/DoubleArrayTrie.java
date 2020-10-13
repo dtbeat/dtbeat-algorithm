@@ -140,8 +140,8 @@ public class DoubleArrayTrie {
                 resize(pos + 1);
 
             if (check[pos] != 0) {
-                nonzero_num++;
-                continue;
+                 nonzero_num++;
+                 continue;
             } else if (first == 0) {
                 nextCheckPos = pos;
                 first = 1;

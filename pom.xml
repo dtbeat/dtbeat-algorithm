@@ -30,6 +30,7 @@
         <module>dtbeat-algorithm-skip-list</module>
         <module>dtbeat-algorithm-leetcode</module>
         <module>dtbeat-algorithm-double-array-trie</module>
+        <module>dtbeat-algorithm-aho-corasick</module>
     </modules>
 
     <properties>
